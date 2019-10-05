@@ -4,7 +4,9 @@ from .views import (
     RegistrationAPIView,
     LoginAPIView,
     UserActivationAPIView,
-    UserResourceAPIView
+    UserResourceAPIView,
+    ForgotPasswordView,
+    ResetPasswordView
 )
 
 urlpatterns = [
@@ -14,6 +16,10 @@ urlpatterns = [
          name='user_login'),
     path('auth/<str:token>', UserActivationAPIView.as_view(),
          name='activate_user'),
+    path('users/forgot_password', ForgotPasswordView.as_view(),
+         name="forgot_password"),
+    path('users/reset_password/<str:token>', ResetPasswordView.as_view(),
+         name="reset_password"),
     path('user/<str:user_id>', UserResourceAPIView.as_view(),
          name="user"),
 ]

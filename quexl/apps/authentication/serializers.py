@@ -143,6 +143,20 @@ class LoginSerializer(serializers.Serializer):
         }
 
 
+class ForgotPasswordSerializer(serializers.Serializer):
+    """Serializer for forget password"""
+
+    email = serializers.CharField(max_length=255)
+
+
+class ResetPasswordSerializer(serializers.Serializer):
+    """Serializer for reset password"""
+
+    class Meta:
+        model = User
+        fields = ('password',)
+
+
 class UserSerializer(serializers.ModelSerializer):
     """Handles serialization and deserialization of User objects."""
 
