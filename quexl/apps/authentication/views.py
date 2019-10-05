@@ -1,15 +1,25 @@
+import datetime
+import furl
+import jwt
+from django.conf import settings
+from django.core.mail import send_mail
+from django.template.loader import render_to_string
 from rest_framework import status
 from rest_framework.generics import GenericAPIView
-from rest_framework.permissions import AllowAny, \
-    IsAuthenticated
+from rest_framework.permissions import (
+    AllowAny, IsAuthenticated
+)
 from rest_framework.response import Response
 from quexl.apps.authentication.email import send_email
 from quexl.apps.authentication.backends import JWTAuthentication
 from quexl.helpers.endpoint_response import get_success_responses
 from .models import User
 from .renderers import UserJSONRenderer
-from .serializers import LoginSerializer, RegistrationSerializer,\
-     UserSerializer
+from .serializers import (
+    LoginSerializer, RegistrationSerializer, ResetPasswordSerializer,
+    ForgotPasswordSerializer, UserSerializer
+
+)
 
 
 class RegistrationAPIView(GenericAPIView):
@@ -116,6 +126,94 @@ class LoginAPIView(GenericAPIView):
             data={
                 "message": 'Only post requests are allowed to this endpoint.'
             })
+
+
+class ForgotPasswordView(GenericAPIView):
+    # This view handles sending the password reset request email.
+    # We expect the user to enter an email that exists in the database
+    permission_classes = (AllowAny,)
+    renderer_classes = (UserJSONRenderer,)
+    serializer_class = ForgotPasswordSerializer
+
+    def post(self, request):
+        """User Forgot Password"""
+        try:
+            requester_data = request.data.get('email')
+            user = User.objects.get(email=requester_data)
+
+            # Get URL for client and include in the email for password reset
+            subject = "Password Reset - Quexl"
+            message = 'Reset your password '
+
+            # generate token token that expires afteer 24 hours
+            token = jwt.encode({
+                "email": user.email,
+                "iat": datetime.datetime.now(),
+                "exp": datetime.datetime.utcnow() + datetime.timedelta(
+                    hours=24)
+            }, settings.SECRET_KEY, algorithm='HS256').decode()
+
+            # format url and send it in the reset email link
+
+            # TODO: Configure link to refer upon password reset
+            client_url = request.META.get(
+                'HTTP_REFERER', request.build_absolute_uri('/').strip("/")
+            )
+            reset_link_url = furl.furl(client_url)
+            reset_link_url.args = (('token', token),)
+
+            body = render_to_string('reset_password.html', {
+                'link': reset_link_url,
+                'name': user.username
+            })
+
+            send_mail(
+                subject,
+                message,
+                settings.EMAIL_HOST_USER,
+                [user.email],
+                html_message=body,
+                fail_silently=True
+            )
+            return Response({
+                "success": "An email has been sent to your inbox with a "
+                            "password reset link."},
+                status=status.HTTP_200_OK)
+
+        except (KeyError, User.DoesNotExist):
+            return Response({
+                "error": "Missing or non-existing email."},
+                status=status.HTTP_404_NOT_FOUND)
+
+
+class ResetPasswordView(GenericAPIView):
+    # This is the view that changes the password.
+    permission_classes = (AllowAny,)
+    serializer_class = ResetPasswordSerializer
+
+    def put(self, request, token, *args, **kwargs):
+        try:
+            new_password = request.data.get('password')
+            serializer = self.serializer_class(data={"password": new_password})
+            serializer.is_valid(raise_exception=True)
+            decode_token = jwt.decode(token, settings.SECRET_KEY,
+                                      algorithms="HS256")
+            email = decode_token.get('email')
+            user = User.objects.get(email=email)
+            user.set_password(new_password)
+            user.save()
+            return get_success_responses(
+                message="Your password has been successfully changed",
+                data={
+                    "email": email
+                },
+                status_code=status.HTTP_200_OK
+            )
+        except jwt.PyJWTError:
+            return Response({
+                "error": "Invalid token. Please request a new password reset "
+                         "link."},
+                status=status.HTTP_403_FORBIDDEN)
 
 
 class UserResourceAPIView(GenericAPIView):
