@@ -19,7 +19,11 @@ from .serializers import (
     ResetPasswordSerializer,
     ForgotPasswordSerializer,
     UserSerializer,
+    SocialAuthSerializer,
 )
+from social_core.backends.oauth import BaseOAuth1, BaseOAuth2
+from social_core.exceptions import MissingBackend
+from social_django.utils import load_strategy, load_backend
 
 
 class RegistrationAPIView(GenericAPIView):
@@ -76,7 +80,7 @@ class UserActivationAPIView(GenericAPIView):
         try:
             data = JWTAuthentication.decode_jwt(token)
             user = User.objects.get(username=data["userdata"])
-        except:  # noqa
+        except (User.DoesNotExist, jwt.exceptions.DecodeError):
             return Response(
                 data={"message": "Activation link is invalid."},
                 status=status.HTTP_400_BAD_REQUEST,
@@ -150,7 +154,7 @@ class ForgotPasswordView(GenericAPIView):
             subject = "Password Reset - Quexl"
             message = "Reset your password "
 
-            # generate token token that expires afteer 24 hours
+            # generate token token that expires after 24 hours
             token = jwt.encode(
                 {
                     "email": user.email,
@@ -246,7 +250,6 @@ class UserResourceAPIView(GenericAPIView):
                 "id": user.id,
                 "email": user.email,
                 "username": user.username,
-                "image": user.photo,
                 "first_name": user.first_name,
                 "last_name": user.last_name,
             }
@@ -256,44 +259,27 @@ class UserResourceAPIView(GenericAPIView):
                 status_code=status.HTTP_200_OK,
             )
 
-        except (KeyError, User.DoesNotExist):
+        except (KeyError, User.DoesNotExist, AttributeError):
             return Response(
-                {"error": "That user id does not exist."},
+                {"error": "That user id %s does not exist." % user_id},
                 status=status.HTTP_404_NOT_FOUND,
             )
 
     def put(self, request, *args, **kwargs):
-        user_data = request.data.get("user", {})
-        serializer_data = {
-            "username": user_data.get("username", request.user.username),
-            "email": user_data.get("email", request.user.email),
-            "profile": {
-                "photo": user_data.get("photo", request.user.profile.photo),
-                "bio": user_data.get("bio", request.user.profile.bio),
-                "country": user_data.get(
-                    "country", request.user.profile.country
-                ),
-                "phone": user_data.get("phone", request.user.profile.phone),
-            },
-        }
-
-        # Here is that serialize, validate, save pattern we talked about
-        # before.
+        new_data = request.data
         serializer = self.serializer_class(
-            request.user, data=serializer_data, partial=True
+            request.user, data=new_data, partial=True
         )
         serializer.is_valid(raise_exception=True)
         serializer.save()
-
         updated_fields = dict()
-        for k, v in user_data.items():
-            if k in serializer_data["profile"]:
-                updated_fields.update({k: v})
+        for k, v in new_data.items():
+            updated_fields.update({k: v})
 
         data = {
             "message": "Update successful",
             "updated-fields": updated_fields,
-            "new-record": serializer_data,
+            "new-record": new_data,
         }
 
         return get_success_responses(
@@ -301,3 +287,82 @@ class UserResourceAPIView(GenericAPIView):
             message="User profile successfully updated",
             status_code=status.HTTP_200_OK,
         )
+
+
+class SocialAuthView(GenericAPIView):
+    """Authenticate via social sites (Google & Facebook)"""
+
+    permission_classes = (AllowAny,)
+    serializer_class = SocialAuthSerializer
+    renderer_classes = (UserJSONRenderer,)
+
+    def post(self, request, *args, **kwargs):
+        """Takes in provider and access_token to authenticate user"""
+        serializer = self.serializer_class(data=request.data["authData"])
+
+        serializer.is_valid(raise_exception=True)
+        provider = serializer.data.get("provider")
+        authenticated_user = (
+            request.user if not request.user.is_anonymous else None
+        )  # noqa E501
+        strategy = load_strategy(request)
+
+        # Load backend associated with the provider
+        try:
+            backend = load_backend(
+                strategy=strategy, name=provider, redirect_uri=None
+            )
+            if isinstance(backend, BaseOAuth1):
+                if "access_token_secret" in request.data:
+                    access_token = {
+                        "oauth_token": request.data["access_token"],
+                        "oauth_token_secret": request.data[
+                            "access_token_secret"
+                        ],  # noqa E501
+                    }
+                else:
+                    return Response(
+                        {"error": "Access token secret is required"},
+                        status=status.HTTP_400_BAD_REQUEST,
+                    )
+
+            elif isinstance(backend, BaseOAuth2):
+
+                access_token = serializer.data.get("access_token")
+
+        except MissingBackend:
+            return Response(
+                {"error": "The Provider is invalid"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        # Go through the pipeline to create user if they don't exist
+        try:
+            user = backend.do_auth(access_token, user=authenticated_user)
+            user.is_active = True
+            user.save()
+
+        except BaseException:
+            return Response(
+                {"error": "Invalid token"}, status=status.HTTP_400_BAD_REQUEST
+            )
+
+        if user and user.is_active:
+            email = user.email
+            username = user.username
+
+            userdata = {
+                "id": user.id,
+                "email": user.email,
+                "username": user.username,
+                "first_name": user.first_name,
+                "last_name": user.last_name,
+            }
+            token = JWTAuthentication.generate_token(userdata=userdata)
+            user_data = {"username": username, "email": email, "token": token}
+
+            return get_success_responses(
+                data=user_data,
+                message="You have successfully logged in",
+                status_code=status.HTTP_200_OK,
+            )
