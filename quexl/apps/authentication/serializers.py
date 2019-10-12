@@ -16,16 +16,16 @@ class RegistrationSerializer(serializers.ModelSerializer):
         # Override the default error_messages with a custom field error
         for field in self.fields:
             error_messages = self.fields[field].error_messages
-            error_messages['null'] = error_messages['blank'] \
-                = error_messages['required'] \
-                = 'Please fill in the {}.'.format(field)
+            error_messages["null"] = error_messages["blank"] = error_messages[
+                "required"
+            ] = "Please fill in the {}.".format(field)
 
     email = serializers.RegexField(
         regex=r"^([a-zA-Z0-9_\-\.]+)@([a-zA-Z0-9_\-\.]+)\.([a-zA-Z]{2,5})$",
         validators=[
             validators.UniqueValidator(
                 queryset=User.objects.all(),
-                message='Email address already exists',
+                message="Email address already exists",
             )
         ],
     )
@@ -34,19 +34,21 @@ class RegistrationSerializer(serializers.ModelSerializer):
     #  cannot be left be blank, has a minimum of 5 characters
     # has alphanumerics only
     username = serializers.RegexField(
-        regex=r'^[A-Za-z\-\_]+\d*$',
+        regex=r"^[A-Za-z\-\_]+\d*$",
         min_length=4,
         max_length=30,
         required=True,
-        validators=[UniqueValidator(
-            queryset=User.objects.all(),
-            message='The username already exists. Kindly try another.'
-        )],
+        validators=[
+            UniqueValidator(
+                queryset=User.objects.all(),
+                message="The username already exists. Kindly try another.",
+            )
+        ],
         error_messages={
-            'min_length': 'Username must have a minimum of 4 characters.',
-            'max_length': 'Username must have a maximum of 30 characters.',
-            'invalid': 'Username cannot only have alphanumeric characters.'
-        }
+            "min_length": "Username must have a minimum of 4 characters.",
+            "max_length": "Username must have a maximum of 30 characters.",
+            "invalid": "Username cannot only have alphanumeric characters.",
+        },
     )
 
     # Ensure passwords are at least 8 characters long,
@@ -56,11 +58,11 @@ class RegistrationSerializer(serializers.ModelSerializer):
         max_length=128,
         write_only=True,
         error_messages={
-            'required': 'Password is required',
-            'max_length': 'Password cannot be more than 128 characters',
-            'min_length': 'Password must have at least 7 characters',
-            'invalid': 'Password must have a number and a letter',
-        }
+            "required": "Password is required",
+            "max_length": "Password cannot be more than 128 characters",
+            "min_length": "Password must have at least 7 characters",
+            "invalid": "Password must have a number and a letter",
+        },
     )
     token = serializers.SerializerMethodField()
 
@@ -68,7 +70,7 @@ class RegistrationSerializer(serializers.ModelSerializer):
         model = User
         # List all of the fields that could possibly be included in a request
         # or response, including fields specified explicitly above.
-        fields = ['email', 'username', 'password', 'token']
+        fields = ["email", "username", "password", "token"]
 
     def create(self, validated_data):
         # Use the `create_user` method we wrote earlier to create a new user.
@@ -78,6 +80,7 @@ class RegistrationSerializer(serializers.ModelSerializer):
 
 class LoginSerializer(serializers.Serializer):
     """The class to serialize login details"""
+
     email = serializers.CharField(max_length=255)
     username = serializers.CharField(max_length=255, read_only=True)
     password = serializers.CharField(max_length=128, write_only=True)
@@ -90,21 +93,21 @@ class LoginSerializer(serializers.Serializer):
         and password and that this combination matches one of the users in
         our database.
         """
-        email = data.get('email', None)
-        password = data.get('password', None)
+        email = data.get("email", None)
+        password = data.get("password", None)
 
         # As mentioned above, an email is required. Raise an exception if an
         # email is not provided.
         if email is None:
             raise serializers.ValidationError(
-                'Your email address is required to log in.'
+                "Your email address is required to log in."
             )
 
         # As mentioned above, a password is required. Raise an exception if a
         # password is not provided.
         if not password:
             raise serializers.ValidationError(
-                'Kindly enter your password to log in.'
+                "Kindly enter your password to log in."
             )
 
         # The `authenticate` method is provided by Django and handles checking
@@ -116,8 +119,8 @@ class LoginSerializer(serializers.Serializer):
         # `authenticate` will return `None`. Raise an exception in this case.
         if user is None:
             raise serializers.ValidationError(
-                'Either your email or password isn’t right. Double check '
-                'them, or reset your password to log in. '
+                "Either your email or password isn’t right. Double check "
+                "them, or reset your password to log in. "
             )
 
         # Django provides a flag on our `User` model called `is_active`. The
@@ -126,8 +129,8 @@ class LoginSerializer(serializers.Serializer):
         # it is worth checking for. Raise an exception in this case.
         if not user.is_active:
             raise serializers.ValidationError(
-                'Your account is inactive. Kindly check your email for an '
-                'activation link to activate '
+                "Your account is inactive. Kindly check your email for an "
+                "activation link to activate "
             )
         token = JWTAuthentication.generate_token(email)
 
@@ -136,11 +139,7 @@ class LoginSerializer(serializers.Serializer):
         This is the data that is passed to the `create` and `update` methods
         that we will see later on.
         """
-        return {
-            'email': user.email,
-            'username': user.username,
-            'token': token
-        }
+        return {"email": user.email, "username": user.username, "token": token}
 
 
 class ForgotPasswordSerializer(serializers.Serializer):
@@ -154,7 +153,7 @@ class ResetPasswordSerializer(serializers.Serializer):
 
     class Meta:
         model = User
-        fields = ('password',)
+        fields = ("password",)
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -165,16 +164,14 @@ class UserSerializer(serializers.ModelSerializer):
     # change them, but that would create extra work while introducing no real
     # benefit, so let's just stick with the defaults.
     password = serializers.CharField(
-        max_length=128,
-        min_length=8,
-        write_only=True
+        max_length=128, min_length=8, write_only=True
     )
 
     # profile = ProfileSerializer()
 
     class Meta:
         model = User
-        fields = ('email', 'username', 'password', 'profile')
+        fields = ("email", "username", "password", "profile")
 
     def update(self, instance, validated_data):
         """Performs an update on a User."""
@@ -184,8 +181,8 @@ class UserSerializer(serializers.ModelSerializer):
         # salting passwords, which is important for security. What that means
         # here is that we need to remove the password field from the
         # `validated_data` dictionary before iterating over it.
-        password = validated_data.pop('password', None)
-        profile_data = validated_data.pop('profile', {})
+        password = validated_data.pop("password", None)
+        profile_data = validated_data.pop("profile", {})
         for (key, value) in profile_data.items():
             setattr(instance.profile, key, value)
         instance.profile.save()  # save the user profile

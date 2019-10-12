@@ -19,9 +19,11 @@ class PushID(object):
     """
 
     # Modeled after base64 web-safe chars, but ordered by ASCII.
-    PUSH_CHARS = ('-0123456789'
-                  'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
-                  '_abcdefghijklmnopqrstuvwxyz')
+    PUSH_CHARS = (
+        "-0123456789"
+        "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+        "_abcdefghijklmnopqrstuvwxyz"
+    )
 
     def __init__(self):
 
@@ -44,7 +46,7 @@ class PushID(object):
         """
 
         now = int(time() * 1000)
-        duplicate_time = (now == self.last_push_time)
+        duplicate_time = now == self.last_push_time
         self.last_push_time = now
 
         unique_id = self.get_unique_id(now)
@@ -71,7 +73,7 @@ class PushID(object):
             time_stamp_chars[i] = self.PUSH_CHARS[now % 64]
             now = int(now / 64)
 
-        unique_id = ''.join(time_stamp_chars)
+        unique_id = "".join(time_stamp_chars)
         return unique_id
 
     def set_last_rand_char(self, duplicate_time):
