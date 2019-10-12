@@ -1,0 +1,47 @@
+resources:
+  containers:
+    - container: Django_Container
+      image: verencelola/custom_ubuntu
+    - container: redis
+      image: redis
+    - container: postgres
+      image: postgres
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+container: 'Django_Container'
+services:
+  redis: redis
+  postgres: postgres
+
+steps:
+
+  - script: |
+      sudo pip install -r requirements.txt
+    displayName: 'Install requirements'
+
+  - script: |
+      python -m pip install flake8
+      flake8 .
+    displayName: 'Run lint tests'
+
+  - script: |
+      env
+      ./manage.py test -- --junitxml=junit/test-results.xml --cov=com --cov-report=xml --cov-report=html
+    env:
+      DATABASE_URL: $(DATABASE_URL)
+      DEBUG: $(DEBUG)
+    displayName: 'Test with pytest'
+
+  - task: PublishTestResults@2
+    condition: succeededOrFailed()
+    inputs:
+      testResultsFiles: '**/test-*.xml'
+      testRunTitle: 'Publish test results for Python $(python.version)'
+
+  - task: PublishCodeCoverageResults@1
+    inputs:
+      codeCoverageTool: Cobertura
+      summaryFileLocation: '$(System.DefaultWorkingDirectory)/**/coverage.xml'
+      reportDirectory: '$(System.DefaultWorkingDirectory)/**/htmlcov'

@@ -83,7 +83,7 @@ environ.Env.read_env(os.path.join(BASE_DIR, '.env'))
 
 DEBUG = env.bool('DEBUG', default=False)
 TEMPLATE_DEBUG = DEBUG
-SECRET_KEY = env.str('SECRET_KEY')
+SECRET_KEY = env.str('SECRET_KEY', '#gy%@@^ySGT@^')
 
 DATABASES = {
     'default': env.db()
