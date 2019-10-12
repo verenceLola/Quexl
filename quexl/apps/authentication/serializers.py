@@ -21,7 +21,7 @@ class RegistrationSerializer(serializers.ModelSerializer):
                 = 'Please fill in the {}.'.format(field)
 
     email = serializers.RegexField(
-        regex="^([a-zA-Z0-9_\-\.]+)@([a-zA-Z0-9_\-\.]+)\.([a-zA-Z]{2,5})$",
+        regex=r"^([a-zA-Z0-9_\-\.]+)@([a-zA-Z0-9_\-\.]+)\.([a-zA-Z]{2,5})$",
         validators=[
             validators.UniqueValidator(
                 queryset=User.objects.all(),
@@ -34,7 +34,7 @@ class RegistrationSerializer(serializers.ModelSerializer):
     #  cannot be left be blank, has a minimum of 5 characters
     # has alphanumerics only
     username = serializers.RegexField(
-        regex='^[A-Za-z\-\_]+\d*$',
+        regex=r'^[A-Za-z\-\_]+\d*$',
         min_length=4,
         max_length=30,
         required=True,
@@ -52,7 +52,7 @@ class RegistrationSerializer(serializers.ModelSerializer):
     # Ensure passwords are at least 8 characters long,
     # at least one letter and at least one number
     password = serializers.RegexField(
-        regex="^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{7,}$",
+        regex=r"^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{7,}$",
         max_length=128,
         write_only=True,
         error_messages={
