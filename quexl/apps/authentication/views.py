@@ -74,7 +74,7 @@ class UserActivationAPIView(GenericAPIView):
         try:
             data = JWTAuthentication.decode_jwt(token)
             user = User.objects.get(username=data['userdata'])
-        except:
+        except:  # noqa
             return Response(
                 data={"message": "Activation link is invalid."},
                 status=status.HTTP_400_BAD_REQUEST)
@@ -178,7 +178,7 @@ class ForgotPasswordView(GenericAPIView):
             return Response({
                 "success": "An email has been sent to your inbox with a "
                             "password reset link."},
-                status=status.HTTP_200_OK)
+                            status=status.HTTP_200_OK)
 
         except (KeyError, User.DoesNotExist):
             return Response({

@@ -29,6 +29,6 @@ def send_email(request, user):
             [user['email']],
             html_message=body,
         )
-    except:
+    except:  # noqa
         return Response(data={"message": "Email activation failed"},
                         status=status.HTTP_400_BAD_REQUEST)

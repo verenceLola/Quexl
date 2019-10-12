@@ -9,6 +9,8 @@ from .views import (
     ResetPasswordView
 )
 
+app_name = 'authentication'
+
 urlpatterns = [
     path('users/register', RegistrationAPIView.as_view(),
          name='user_signup'),
