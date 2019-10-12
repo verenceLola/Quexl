@@ -22,8 +22,7 @@ steps:
     displayName: 'Install requirements'
 
   - script: |
-      python -m pip install flake8
-      flake8 .
+      black --check quexl
     displayName: 'Run lint tests'
 
   - script: |
