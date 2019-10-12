@@ -1,0 +1,27 @@
+{
+  "addons": [
+    "heroku-postgresql"
+  ],
+  "buildpacks": [
+    {
+      "url": "heroku/python"
+    }
+  ],
+  "env": {
+    "DEBUG": {
+      "required": true
+    },
+    "DISABLE_COLLECTSTATIC": {
+      "required": true
+    },
+    "SECRET_KEY": {
+      "required": true
+    }
+  },
+  "formation": {
+  },
+  "name": "Quexl",
+  "scripts": {
+  },
+  "stack": "heroku-18"
+}
