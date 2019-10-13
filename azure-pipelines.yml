@@ -2,8 +2,6 @@ resources:
   containers:
     - container: Django_Container
       image: verencelola/custom_ubuntu
-    - container: redis
-      image: redis
     - container: postgres
       image: postgres
 
@@ -12,7 +10,6 @@ pool:
 
 container: 'Django_Container'
 services:
-  redis: redis
   postgres: postgres
 
 steps:
@@ -23,10 +20,10 @@ steps:
 
   - script: |
       black --check quexl
+      flake8 .
     displayName: 'Run lint tests'
 
   - script: |
-      env
       ./manage.py test -- --junitxml=junit/test-results.xml --cov=com --cov-report=xml --cov-report=html
     env:
       DATABASE_URL: $(DATABASE_URL)

@@ -5,3 +5,8 @@
         language: system
         entry: black
         types: [python]
+      - id: flake8
+        name: flake8
+        language: system
+        entry: flake8
+        types: [python]

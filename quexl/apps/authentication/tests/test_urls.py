@@ -40,7 +40,7 @@ def test_activate_user_url_resolves():
     assert resolve(url).func.view_class == UserActivationAPIView
 
 
-def reset_password_url_resolves():
+def test_reset_password_url_resolves():
     """
     test reset pssword url resolves
     """
