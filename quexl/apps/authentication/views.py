@@ -128,14 +128,6 @@ class LoginAPIView(GenericAPIView):
             status_code=status.HTTP_200_OK,
         )
 
-    def get(self):
-        """Get a user"""
-        return Response(
-            data={
-                "message": "Only post requests are allowed to this endpoint."
-            }
-        )
-
 
 class ForgotPasswordView(GenericAPIView):
     # This view handles sending the password reset request email.
