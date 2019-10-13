@@ -1,13 +1,19 @@
-from quexl.apps.authentication.models import User
+from quexl.apps.authentication.models import User, Address
 import pytest
 from .fixtures import user_details_without_email, user_details_without_username
 
 
-def test_create_new_user(create_db_user):
+@pytest.mark.django_db
+def test_create_new_user():
     """
     test creating a new db user
     """
-    user = create_db_user
+    userdata = {
+        "username": "user1",
+        "email": "user1@email.com",
+        "password": None,
+    }
+    user = User.objects.create_user(**userdata)
     users = User.objects.all()
     assert users.count() == 1
     assert not user.is_active  # confirm new user is not active
@@ -99,3 +105,20 @@ def test_create_super_user(db):
     super_user_details["password"] = None
     with pytest.raises(TypeError, match="Superusers must have a password."):
         User.objects.create_superuser(**super_user_details)
+
+
+def test_address(db):
+    """
+    test address creation
+    """
+    address_details = {
+        "street_address_1": "Site and Service",
+        "city": "Nairobi",
+        "city_area": "Kasarani",
+        "postal_code": "001-001",
+        "country": "KE",
+        "country_area": "Western",
+        "phone": "+254713077520",
+    }
+    address = Address.objects.create(**address_details)
+    assert address.address == address_details.get("city")

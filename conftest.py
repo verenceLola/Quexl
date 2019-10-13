@@ -16,6 +16,8 @@ def create_db_user(django_user_model):
         "email": "user1@quexl.com",
     }
     user1 = django_user_model.objects.create_user(**user_details)
+    user1.is_active = True  # activate user account
+    user1.save()
     return user1
 
 

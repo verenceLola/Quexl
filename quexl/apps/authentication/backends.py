@@ -78,6 +78,7 @@ class JWTAuthentication(TokenAuthentication):
                 "iat": datetime.datetime.utcnow(),
                 "exp": datetime.datetime.utcnow()
                 + datetime.timedelta(minutes=720),
+                "jti": settings.SECRET_KEY,
             },
             settings.SECRET_KEY,
             algorithm="HS256",

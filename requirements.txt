@@ -23,6 +23,7 @@ djangorestframework==3.10.3
 entrypoints==0.3
 environ==1.0
 flake8==3.7.8
+freezegun==0.3.12
 furl==2.1.0
 gunicorn==19.9.0
 identify==1.4.7
@@ -51,6 +52,7 @@ pyparsing==2.4.2
 pytest==5.2.1
 pytest-cov==2.8.1
 pytest-django==3.5.1
+python-dateutil==2.8.0
 python-social-auth==0.3.6
 python3-openid==3.1.0
 pytz==2019.2
