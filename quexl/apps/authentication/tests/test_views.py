@@ -101,3 +101,72 @@ def test_reset_password(
     reset_url = reverse("authentication:reset_password", args=[reset_token])
     response = client.put(reset_url)
     assert response.data == expected_response
+
+
+def test_forgot_password(client, create_db_user):
+    """
+    test forgot user password view
+    """
+    user = create_db_user
+    forgot_password_url = reverse("authentication:forgot_password")
+    response = client.post(forgot_password_url, {"email": user.email})
+    assert response.data == {
+        "success": "An email has been sent to your inbox with a password reset link."
+    }
+    assert response.status_code == 200
+
+
+@pytest.mark.django_db
+def test_forgot_password_with_invalid_email(client):
+    """
+    test forgot user password with non-existing email
+    """
+    forgot_password_url = reverse("authentication:forgot_password")
+    response = client.post(forgot_password_url, {"email": "wrong@email.com"})
+    assert response.data == {"error": "Missing or non-existing email."}
+    assert response.status_code == 404
+
+
+def test_get_user_info(client, generate_access_token1):
+    """
+    test get user info
+    """
+    token, user = generate_access_token1
+    user_url = reverse("authentication:user", args=[user.id])
+    response = client.get(user_url, HTTP_AUTHORIZATION="Bearer " + token)
+    assert response.data["message"] == "User details fetched successfully"
+    assert response.data["data"]["id"] == user.id
+    assert response.status_code == 200
+
+
+def test_get_user_with_invalid_id(client, generate_access_token1):
+    """
+    test get user info with invalid id
+    """
+    token, _ = generate_access_token1
+    user_url = reverse(
+        "authentication:user", args=[456]
+    )  # non existing user id
+    response = client.get(user_url, HTTP_AUTHORIZATION="Bearer " + token)
+    assert response.data == {"error": "That user id %d does not exist." % 456}
+    assert response.status_code == 404
+
+
+def test_edit_user_info(client, generate_access_token1, django_user_model):
+    """
+    test edit user info
+    """
+    token, user = generate_access_token1
+    user_url = reverse("authentication:user", args=[user.id])
+    new_details = {"email": "new@email.com"}
+    response = client.put(
+        user_url,
+        new_details,
+        HTTP_AUTHORIZATION="Bearer " + token,
+        content_type="application/json",
+    )
+    print(response.data)
+    assert response.status_code == 200
+    assert response.data["message"] == "User profile successfully updated"
+    updated_user = django_user_model.objects.get(pk=user.id)
+    assert updated_user.email != user.email
