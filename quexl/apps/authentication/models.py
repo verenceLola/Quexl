@@ -103,7 +103,7 @@ class UserManager(BaseUserManager):
 
     def regular_user(self):
         return self.get_queryset().filter(
-            Q(is_staff=False) | (Q(is_staff=True) & Q(trips__isnull=False))
+            Q(is_staff=False) | (Q(is_staff=True))
         )
 
     def staff(self):
@@ -128,8 +128,6 @@ class User(AbstractBaseUser, PermissionsMixin):
     date_of_joining = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
-    # The `USERNAME_FIELD` property tells us which field we will use to log in.
-    # In this case, we want that to be the username field.
     USERNAME_FIELD = "email"
     REQUIRED_FIELDS = ["username"]
 
@@ -158,7 +156,6 @@ class User(AbstractBaseUser, PermissionsMixin):
     def __str__(self):
         """
         Returns a string representation of this `User`.
-        This string is used when a `User` is printed in the console.
         """
         return self.username
 
