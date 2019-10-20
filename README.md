@@ -3,13 +3,13 @@
 [![Build Status](https://travis-ci.com/verenceLola/Quexl.svg?token=A77sHzTptZ8EutExRXpa&branch=develop)](https://travis-ci.com/verenceLola/Quexl)
 [![Build Status](https://verencelola.visualstudio.com/Quexl/_apis/build/status/verenceLola.Quexl?branchName=develop)](https://verencelola.visualstudio.com/Quexl/_build/latest?definitionId=12&branchName=develop)
 ![Build Status](https://github.com/verenceLola/Quexl/workflows/Django%20application/badge.svg)
-[![codecov](https://codecov.io/gh/verenceLola/Quexl/branch/master/graph/badge.svg?token=zNEszwcQ4u)](https://codecov.io/gh/verenceLola/Quexl)
+[![codecov](https://codecov.io/gh/verenceLola/Quexl/branch/develop/graph/badge.svg?token=zNEszwcQ4u)](https://codecov.io/gh/verenceLola/Quexl)
 
 This is a Feverr-Like Django backend
 
-[![Run in Postman](https://run.pstmn.io/button.svg)](https://app.getpostman.com/run-collection/00c60f21801792893c40)
+[![Run in Postman](https://run.pstmn.io/button.svg)](https://app.getpostman.com/run-collection/2acad8ef40948488fbab#?env%5BQuexl%5D=W3sia2V5IjoiYmFzZV91cmwiLCJ2YWx1ZSI6IiIsImVuYWJsZWQiOnRydWV9LHsia2V5IjoidG9rZW4iLCJ2YWx1ZSI6IiIsImVuYWJsZWQiOnRydWV9XQ==)
 
-The Application has been documented using Postman Documentation tht can be viewed [here.](https://documenter.getpostman.com/view/4146974/SVtR3Atw)
+The Application has been documented using Postman Documentation tht can be viewed [here.](https://documenter.getpostman.com/view/4146974/SVtVVp1U?version=latest)
 
 ## Setting Up the Application Locally
 

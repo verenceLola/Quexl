@@ -33,6 +33,7 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "rest_framework",
+    "rolepermissions",
     # local apps
     "quexl.apps.authentication",
     # external apps
@@ -50,6 +51,8 @@ MIDDLEWARE = [
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
+
+ROLEPERMISSIONS_MODULE = "quexl.apps.roles.roles"
 
 ROOT_URLCONF = "quexl.urls"
 

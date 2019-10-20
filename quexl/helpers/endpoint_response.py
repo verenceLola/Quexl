@@ -8,4 +8,4 @@ def get_success_responses(message, data, **kwargs):
 
 
 def get_error_response(message, **kwargs):
-    return Response(({"message": message}, kwargs.get("status_code")))
+    return Response({"message": message}, kwargs.get("status_code"))
