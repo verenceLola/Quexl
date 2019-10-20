@@ -97,6 +97,7 @@ class UserManager(BaseUserManager):
 
         user = self.create_user(username, email, password)
         user.is_superuser = True
+        user.is_staff = True
         user.save()
 
         return user
@@ -125,7 +126,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     last_name = models.CharField(max_length=256, blank=True)
     is_active = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
-    date_of_joining = models.DateTimeField(auto_now_add=True)
+    is_staff = models.BooleanField(default=False)
     updated_at = models.DateTimeField(auto_now=True)
 
     USERNAME_FIELD = "email"

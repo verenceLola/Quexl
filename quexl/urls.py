@@ -20,4 +20,5 @@ urlpatterns = [
     path("admin/", admin.site.urls),
     path("api/", include("quexl.apps.authentication.urls")),
     path("", include("social_django.urls", namespace="social-auth")),  # noqa
+    path("api/", include("quexl.apps.roles.urls")),
 ]

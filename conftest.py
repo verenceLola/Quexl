@@ -40,4 +40,34 @@ def create_superuser(django_user_model):
         "email": "super@quexl.com",
     }
     superuser = django_user_model.objects.create_superuser(**superuser_details)
+    superuser.is_active = True
+    superuser.save()
     return superuser
+
+
+@pytest.fixture()
+def generate_superuser_access_token(create_superuser):
+    """
+    generate superuser token
+    """
+    superuser = create_superuser
+    details = {"username": superuser.username, "email": superuser.email}
+    jwt = JWTAuthentication()
+    encoded_token = jwt.generate_token(details)
+    return encoded_token
+
+
+@pytest.fixture
+def create_db_user2(django_user_model):
+    """
+    create a db user
+    """
+    user_details = {
+        "username": "user2",
+        "password": "pass123",
+        "email": "user2@quexl.com",
+    }
+    user2 = django_user_model.objects.create_user(**user_details)
+    user2.is_active = True  # activate user account
+    user2.save()
+    return user2
