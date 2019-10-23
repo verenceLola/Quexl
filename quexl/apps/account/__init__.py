@@ -7,15 +7,16 @@ from django.apps import AppConfig
 class AuthenticationAppConfig(AppConfig):
     """define the app config"""
 
-    label = "authentication"
-    name = "quexl.apps.authentication"
-    verbose_name = "Authentication"
+    label = "account"
+    name = "quexl.apps.account"
+    verbose_name = "Account"
 
     def ready(self):
         """
         register signal handlers when app is ready
         """
-        from quexl.apps.authentication.signals import roles  # noqa
+        from quexl.apps.account.signals import roles  # noqa
+        from quexl.apps.account.signals import profiles  # noqa
 
 
-default_app_config = "quexl.apps.authentication.AuthenticationAppConfig"
+default_app_config = "quexl.apps.account.AuthenticationAppConfig"

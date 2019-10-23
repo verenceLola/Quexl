@@ -3,7 +3,7 @@ from django.contrib.auth import authenticate
 from rest_framework import serializers, validators
 from rest_framework.validators import UniqueValidator
 
-from quexl.apps.authentication.backends import JWTAuthentication
+from quexl.apps.account.backends import JWTAuthentication
 from .models import User
 
 

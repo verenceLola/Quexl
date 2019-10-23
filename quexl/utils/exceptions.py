@@ -9,8 +9,9 @@ from rest_framework.response import Response
 from rest_framework import status
 
 view_map = {
-    "profiles": lambda response, **kwargs: get_error_response(
-        "User profile %s does not exist" % kwargs["profile_id"],
+    "profiles": lambda operation, response, **kwargs: get_error_response(
+        "%s failed. Fix the error(s) below" % operation,
+        "User profile '%s' does not exist" % kwargs["profile_id"],
         status_code=response.status_code,
     )
 }
@@ -23,12 +24,14 @@ def custom_exception_handler(exc, context):
     response = exception_handler(exc, context)
     if isinstance(exc, Http404):  # Customize Http404 exceptions
         return view_map.get(context["view"].name)(
-            response, **context["kwargs"]
+            context["view"].operation, response, **context["kwargs"]
         )
-    operation = context["view"].operation
     if isinstance(
         exc, ValidationError
     ):  # customize ValidationError exceptions
+        operation = context[
+            "view"
+        ].operation  # every view method should have an operation
         return Response(
             {
                 "message": "%s failed. Fix the error(s) below" % operation,

@@ -35,10 +35,13 @@ INSTALLED_APPS = [
     "rest_framework",
     "rolepermissions",
     # local apps
-    "quexl.apps.authentication",
+    "quexl.apps.account",
+    "quexl.apps.profiles",
     # external apps
     "phonenumber_field",
     "social_django",
+    "djmoney",
+    "languages",
 ]
 
 MIDDLEWARE = [
@@ -99,7 +102,7 @@ EMAIL_PORT = env.int("EMAIL_PORT", "")
 EMAIL_HOST_USER = env.str("EMAIL_HOST_USER", "")
 EMAIL_HOST_PASSWORD = env.str("EMAIL_HOST_PASSWORD", "")
 
-AUTH_USER_MODEL = "authentication.User"
+AUTH_USER_MODEL = "account.User"
 SOCIAL_AUTH_POSTGRES_JSONFIELD = (
     True
 )  # Use PostgreSQL JSONB to store extra_data  # noqa E501
@@ -143,7 +146,7 @@ REST_FRAMEWORK = {
     "DEFAULT_PERMISSION_CLASSES": ("rest_framework.permissions.AllowAny",),
     "DEFAULT_AUTHENTICATION_CLASSES": (
         # specifies a local custom authentication class
-        "quexl.apps.authentication.backends.JWTAuthentication",
+        "quexl.apps.account.backends.JWTAuthentication",
     ),
     "EXCEPTION_HANDLER": "quexl.utils.exceptions.custom_exception_handler",
 }

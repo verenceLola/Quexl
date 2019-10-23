@@ -5,7 +5,7 @@ from django.template.loader import render_to_string
 from rest_framework import status
 from rest_framework.response import Response
 
-from quexl.apps.authentication.backends import JWTAuthentication
+from quexl.apps.account.backends import JWTAuthentication
 
 
 def send_email(request, user):
@@ -20,7 +20,6 @@ def send_email(request, user):
         "verify_account.html",
         {"link": activation_link, "name": user["username"]},
     )
-
     try:
         send_mail(
             subject,

@@ -2,7 +2,7 @@
 configure common methods for testing
 """
 import pytest
-from quexl.apps.authentication.backends import JWTAuthentication
+from quexl.apps.account.backends import JWTAuthentication
 
 
 @pytest.fixture

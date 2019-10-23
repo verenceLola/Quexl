@@ -1,4 +1,4 @@
-from quexl.apps.authentication.backends import JWTAuthentication
+from quexl.apps.account.backends import JWTAuthentication
 
 user_details_without_email = {
     "password": "pass123",

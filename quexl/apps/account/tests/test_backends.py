@@ -1,7 +1,7 @@
 """
 test authentication backends
 """
-from quexl.apps.authentication.backends import JWTAuthentication
+from quexl.apps.account.backends import JWTAuthentication
 import pytest
 import freezegun
 import datetime

@@ -1,5 +1,5 @@
 from django.urls import reverse, resolve
-from quexl.apps.authentication.views import (
+from quexl.apps.account.views import (
     RegistrationAPIView,
     LoginAPIView,
     ForgotPasswordView,

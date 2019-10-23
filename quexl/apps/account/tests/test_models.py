@@ -1,4 +1,5 @@
-from quexl.apps.authentication.models import User, Address
+from quexl.apps.account.models import User
+from quexl.apps.profiles.models import Address
 import pytest
 from .fixtures import user_details_without_email, user_details_without_username
 
@@ -17,19 +18,6 @@ def test_create_new_user():
     users = User.objects.all()
     assert users.count() == 1
     assert not user.is_active  # confirm new user is not active
-
-
-def test_get_user_fullname(create_db_user):
-    """
-    test getting user's fullname
-    """
-    user = create_db_user
-    user.first_name = "firstname1"
-    user.last_name = "lastname1"
-    user.save()  # save user details
-    assert user.name == "firstname1 lastname1"
-    assert user.get_full_name == user.username
-    assert user.get_short_name() == user.username
 
 
 def test_object_string_representation(create_db_user):
@@ -107,18 +95,19 @@ def test_create_super_user(db):
         User.objects.create_superuser(**super_user_details)
 
 
-def test_address(db):
+def test_address(create_db_user):
     """
     test address creation
     """
+    profile = create_db_user.profile
     address_details = {
         "street_address_1": "Site and Service",
         "city": "Nairobi",
         "city_area": "Kasarani",
-        "postal_code": "001-001",
+        "postal_code": "001001",
         "country": "KE",
         "country_area": "Western",
         "phone": "+254713077520",
     }
-    address = Address.objects.create(**address_details)
+    address = Address.objects.create(profile=profile, **address_details)
     assert address.address == address_details.get("city")
