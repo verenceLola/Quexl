@@ -3,7 +3,7 @@ signal to add regular user role to every new user
 """
 from django.db.models.signals import post_save
 from django.dispatch import receiver
-from quexl.apps.authentication.models import User
+from quexl.apps.account.models import User
 from rolepermissions.roles import assign_role
 
 

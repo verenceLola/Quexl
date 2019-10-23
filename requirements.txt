@@ -19,9 +19,12 @@ django-cors-headers==3.1.1
 django-countries==5.5
 django-discover-runner==1.0
 django-environ==0.4.5
+django-language-field==0.0.3
+django-money==0.15.1
 django-phonenumber-field==3.0.1
 django-role-permissions==2.2.1
 djangorestframework==3.10.3
+drf-writable-nested==0.5.1
 entrypoints==0.3
 environ==1.0
 flake8==3.7.8
@@ -47,6 +50,7 @@ pluggy==0.13.0
 pre-commit==1.18.3
 psycopg2==2.8.3
 py==1.8.0
+py-moneyed==0.8.0
 pycodestyle==2.5.0
 pycparser==2.19
 pyflakes==2.1.1

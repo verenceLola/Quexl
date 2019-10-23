@@ -8,8 +8,8 @@ from rest_framework import status
 from rest_framework.generics import GenericAPIView
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
-from quexl.apps.authentication.email import send_email
-from quexl.apps.authentication.backends import JWTAuthentication
+from quexl.apps.account.email import send_email
+from quexl.apps.account.backends import JWTAuthentication
 from .models import User
 from .renderers import UserJSONRenderer
 from .serializers import (
@@ -113,8 +113,6 @@ class LoginAPIView(GenericAPIView):
             "id": user.id,
             "email": user.email,
             "username": user.username,
-            "first_name": user.first_name,
-            "last_name": user.last_name,
         }
         token = JWTAuthentication.generate_token(userdata=userdata)
 
@@ -341,8 +339,6 @@ class SocialAuthView(GenericAPIView):
                 "id": user.id,
                 "email": user.email,
                 "username": user.username,
-                "first_name": user.first_name,
-                "last_name": user.last_name,
             }
             token = JWTAuthentication.generate_token(userdata=userdata)
 
