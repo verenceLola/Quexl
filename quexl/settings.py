@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     "social_django",
     "djmoney",
     "languages",
+    "mptt",
 ]
 
 MIDDLEWARE = [

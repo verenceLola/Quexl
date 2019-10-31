@@ -19,8 +19,10 @@ django-cors-headers==3.1.1
 django-countries==5.5
 django-discover-runner==1.0
 django-environ==0.4.5
+django-js-asset==1.2.2
 django-language-field==0.0.3
 django-money==0.15.1
+django-mptt==0.10.0
 django-phonenumber-field==3.0.1
 django-role-permissions==2.2.1
 djangorestframework==3.10.3
