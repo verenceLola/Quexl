@@ -63,6 +63,7 @@ class Service(models.Model):
 
     class Meta:
         verbose_name_plural = "services"
+        unique_together = ("name", "seller")
 
     id = models.CharField(
         db_index=True,
@@ -78,8 +79,8 @@ class Service(models.Model):
     )
     delivery_time = models.DateTimeField()
     created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now_add=True)
-    seller = models.OneToOneField(
+    updated_at = models.DateTimeField(auto_now=True)
+    seller = models.ForeignKey(
         User, on_delete=models.CASCADE, related_name="service_seller"
     )
     category = TreeForeignKey(
@@ -88,13 +89,6 @@ class Service(models.Model):
 
     def __str__(self):
         return self.name
-
-    @property
-    def priceInfo(self):
-        """
-        return price info: amount & currency
-        """
-        return self.price
 
 
 class Order(models.Model):
@@ -121,8 +115,8 @@ class Order(models.Model):
     amount = MoneyField(
         max_digits=19, decimal_places=4, default=0.0000, default_currency="USD"
     )
-    created_at = models.DateTimeField(auto_now=True)
-    updated_at = models.DateTimeField(auto_now_add=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
     date_ending = models.DateTimeField()
     number_of_revisions = models.PositiveIntegerField()
     status = models.CharField(

@@ -5,14 +5,11 @@ from rest_framework.renderers import JSONRenderer
 from rest_framework import status
 
 
-message_map = {
-    "category": lambda status_code: {
-        "POST": "Category created successfully",
-        "PATCH": "Catergory updated succesfully",
-        "DELETE": "Category deleted successfully",
-        "GET": "All Categories",
-    }.get(status_code)
-}
+message_map = lambda view: lambda status_code: {  # noqa
+    "POST": "%s created successfully" % view.name.capitalize(),
+    "PATCH": "%s updated succesfully" % view.name.capitalize(),
+    "DELETE": "%s deleted successfully" % view.name.capitalize(),
+}.get(status_code)
 
 
 class ServicesRenderer(JSONRenderer):
@@ -25,16 +22,20 @@ class ServicesRenderer(JSONRenderer):
         format response data for services views
         """
         status_code = render_context["response"].status_code
-        data = (
-            (
-                {
-                    "status": "success",
-                    "message": message_map.get(render_context["view"].name)(
-                        render_context["request"].method
-                    ),
-                    "data": data,
-                }
+        if render_context["request"].method == "GET":
+            if render_context["kwargs"] == {}:
+                message = (
+                    "All %s"
+                    % render_context["view"].pluralized_name.capitalize()
+                )
+            else:
+                message = "%s info" % render_context["view"].name.capitalize()
+        else:
+            message = message_map(render_context["view"])(
+                render_context["request"].method
             )
+        data = (
+            ({"status": "success", "message": message, "data": data})
             if status.is_success(status_code)
             else {
                 "status": "error",

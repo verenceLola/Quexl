@@ -13,7 +13,7 @@ from quexl.apps.services.models import (
     Request,
     Payment,
 )
-from quexl.apps.services.permissions import IsOwnerOrReadOnly, IsSellerOrBuyer
+from quexl.apps.services.permissions import IsSellerOrReadOnly, IsSellerOrBuyer
 from quexl.apps.services.serializers import (
     ServicesSerializer,
     CategorySerializer,
@@ -26,14 +26,60 @@ from quexl.apps.services.renderers import ServicesRenderer
 from rest_framework import response, status
 
 
-class ServicesAPIView(ModelViewSet):
+class APIViewWrapper(RetrieveUpdateDestroyAPIView):
     """
-    services view
+    prevent updating using PUT, define delete()
     """
 
-    permission_classes = (IsOwnerOrReadOnly, IsAuthenticated)
+    def put(self, request, **kwargs):
+        """
+        update object
+        """
+        return response.Response(
+            {"message": "To update %s, use PATCH method" % self.name},
+            status=status.HTTP_405_METHOD_NOT_ALLOWED,
+        )
+
+    def delete(self, request, **kwargs):
+        """
+        delete category with all of its sub-categories
+        """
+        obj = self.get_object()
+        obj.delete()
+        return response.Response({}, status=status.HTTP_200_OK)
+
+
+class ServicesViewSet(ListCreateAPIView):
+    """
+    services view for listing and creating services
+    """
+
+    name = "service"
+    pluralized_name = "services"
+    permission_classes = (IsSellerOrReadOnly, IsAuthenticated)
     queryset = Service.objects.all()
+    renderer_classes = (ServicesRenderer,)
     serializer_class = ServicesSerializer
+
+
+class ServicesAPIView(APIViewWrapper, RetrieveUpdateDestroyAPIView):
+    """
+    service view for updating and deleting a service
+    """
+
+    permission_classes = (IsSellerOrReadOnly, IsAuthenticated)
+    serializer_class = ServicesSerializer
+    renderer_classes = (ServicesRenderer,)
+    name = "service"
+    pluralized_name = "services"
+    lookup_url_kwarg = "service_id"
+
+    def get_queryset(self):
+        """
+        return given service_id instance
+        """
+        service_id = self.kwargs.get(self.lookup_url_kwarg)
+        return Service.objects.filter(id=service_id)
 
 
 class CategoryListCreateAPIView(ListCreateAPIView):
@@ -42,13 +88,16 @@ class CategoryListCreateAPIView(ListCreateAPIView):
     """
 
     name = "category"
+    pluralized_name = "categories"
     permission_classes = (IsAuthenticated,)
     queryset = Category.objects.filter(level=0)  # get root nodes
     serializer_class = CategorySerializer
     renderer_classes = (ServicesRenderer,)
 
 
-class CategoryUpdateDestroyAPIView(RetrieveUpdateDestroyAPIView):
+class CategoryUpdateDestroyAPIView(
+    APIViewWrapper, RetrieveUpdateDestroyAPIView
+):
     """
     categories view for updating and deleting categories
     """
@@ -66,30 +115,13 @@ class CategoryUpdateDestroyAPIView(RetrieveUpdateDestroyAPIView):
         category_id = self.kwargs.get(self.lookup_url_kwarg)
         return Category.objects.filter(id=category_id)
 
-    def put(self, request, **kwargs):
-        """
-        update category details
-        """
-        return response.Response(
-            {"message": "To update category, use PATCH method"},
-            status=status.HTTP_405_METHOD_NOT_ALLOWED,
-        )
-
-    def delete(self, request, category_id):
-        """
-        delete category with all of its sub-categories
-        """
-        category = self.get_object()
-        category.delete()
-        return response.Response({}, status=status.HTTP_200_OK)
-
 
 class OrdersAPIView(ModelViewSet):
     """
     orders view
     """
 
-    permission_classes = (IsOwnerOrReadOnly, IsAuthenticated)
+    permission_classes = (IsSellerOrReadOnly, IsAuthenticated)
     serializer_class = OrdersSerializer
     lookup_url_kwarg = "service_id"
 
@@ -106,7 +138,7 @@ class ServiceRequestAPIView(ModelViewSet):
     request service view
     """
 
-    permission_classes = (IsOwnerOrReadOnly, IsAuthenticated)
+    permission_classes = (IsSellerOrReadOnly, IsAuthenticated)
     queryset = Request.objects.all()
     serializer_class = ServiceRequestSerializer
 

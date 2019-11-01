@@ -12,6 +12,10 @@ from quexl.apps.services.models import (
 from quexl.apps.account.serializers import UserSerializer
 from rest_framework.validators import ValidationError
 from mptt.exceptions import InvalidMove
+from datetime import datetime
+from pytz import UTC
+from djmoney.money import DefaultMoney
+from moneyed.classes import CurrencyDoesNotExist
 
 
 class PriceSerializer(serializers.Serializer):
@@ -114,8 +118,66 @@ class ServicesSerializer(serializers.ModelSerializer):
         model = Service
         exclude = ("price_currency",)
 
-    price = PriceSerializer(source=("priceInfo"))
-    category = CategorySerializer()
+    price = PriceSerializer()
+    category = CategorySerializer(read_only=True)
+    seller = UserSerializer(read_only=True)
+    category_id = serializers.CharField(write_only=True, required=False)
+    created_at = serializers.DateTimeField(read_only=True)
+    update_at = serializers.DateTimeField(read_only=True)
+
+    def validate(self, data):
+        """
+        validate service data
+        """
+        category_id = data.get("category_id", None)
+        if category_id:
+            try:
+                category = Category.objects.get(pk=category_id)
+                data.update({"category": category})
+            except Category.DoesNotExist:
+                raise ValidationError(
+                    "Category with id %s does not exist" % category_id
+                )
+        return data
+
+    def validate_name(self, value):
+        """
+        validate user doesn't have service with same name
+        """
+        if Service.objects.filter(name=value):
+            raise ValidationError(
+                "service with '%s' name elready exists" % value
+            )
+        return value
+
+    def create(self, validated_data):
+        """
+        create a service with seller as the current user
+        """
+        validated_data.update({"seller": self.context["request"].user})
+        service = Service.objects.create(**validated_data)
+        return service
+
+    def validate_delivery_time(self, value):
+        """
+        ensure delivery time is a future date
+        """
+        if datetime.utcnow().replace(tzinfo=UTC) > value:
+            raise ValidationError("Delivery time cannot be a past date")
+        return value
+
+    def validate_price(self, value):
+        """
+        validate price info
+        """
+        priceInfo = self.initial_data["price"]
+        try:
+            money = DefaultMoney(
+                amount=priceInfo["amount"], currency=priceInfo["currency"]
+            )
+        except CurrencyDoesNotExist:
+            raise ValidationError("Currency does not exist")
+        return money
 
 
 class OrdersSerializer(serializers.ModelSerializer):

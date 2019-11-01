@@ -6,6 +6,7 @@ from quexl.apps.services.views import (
     CategoryListCreateAPIView,
     CategoryUpdateDestroyAPIView,
     OrdersAPIView,
+    ServicesViewSet,
     ServiceRequestAPIView,
     OrderPaymentsAPIView,
 )
@@ -18,10 +19,11 @@ seller_router = DefaultRouter()
 seller_router.register(r"sell/payments", OrderPaymentsAPIView)
 urlpatterns = [
     path("", include(seller_router.urls)),
+    path("sell/services", ServicesViewSet.as_view(), name="user services"),
     path(
-        "sell/services",
-        ServicesAPIView.as_view({"get": "list"}),
-        name="user services",
+        "sell/services/<str:service_id>",
+        ServicesAPIView.as_view(),
+        name="update-delete service",
     ),
     path(
         "categories/",
