@@ -14,8 +14,10 @@ from rest_framework.validators import ValidationError
 from mptt.exceptions import InvalidMove
 from datetime import datetime
 from pytz import UTC
+from rest_framework.exceptions import PermissionDenied
 from djmoney.money import DefaultMoney
 from moneyed.classes import CurrencyDoesNotExist
+from rolepermissions.checkers import has_permission
 
 
 class PriceSerializer(serializers.Serializer):
@@ -37,6 +39,27 @@ class PriceSerializer(serializers.Serializer):
         get price currency
         """
         return obj.currency.__str__()
+
+
+class PriceSerializerWrapper(serializers.ModelSerializer):
+    """
+    wrapper for price serializer and methods
+    """
+
+    price = PriceSerializer()
+
+    def validate_price(self, value):
+        """
+        validate price info
+        """
+        priceInfo = self.initial_data["price"]
+        try:
+            money = DefaultMoney(
+                amount=priceInfo["amount"], currency=priceInfo["currency"]
+            )
+        except CurrencyDoesNotExist:
+            raise ValidationError("Currency does not exist")
+        return money
 
 
 class CategorySerializer(serializers.ModelSerializer):
@@ -109,7 +132,7 @@ class CategorySerializer(serializers.ModelSerializer):
         return instance
 
 
-class ServicesSerializer(serializers.ModelSerializer):
+class ServicesSerializer(PriceSerializerWrapper):
     """
     serializer for the services model
     """
@@ -118,7 +141,6 @@ class ServicesSerializer(serializers.ModelSerializer):
         model = Service
         exclude = ("price_currency",)
 
-    price = PriceSerializer()
     category = CategorySerializer(read_only=True)
     seller = UserSerializer(read_only=True)
     category_id = serializers.CharField(write_only=True, required=False)
@@ -166,32 +188,78 @@ class ServicesSerializer(serializers.ModelSerializer):
             raise ValidationError("Delivery time cannot be a past date")
         return value
 
-    def validate_price(self, value):
-        """
-        validate price info
-        """
-        priceInfo = self.initial_data["price"]
-        try:
-            money = DefaultMoney(
-                amount=priceInfo["amount"], currency=priceInfo["currency"]
-            )
-        except CurrencyDoesNotExist:
-            raise ValidationError("Currency does not exist")
-        return money
 
-
-class OrdersSerializer(serializers.ModelSerializer):
+class OrdersSerializer(PriceSerializerWrapper):
     """
     serializer for services orders
     """
 
     class Meta:
         model = Order
-        exclude = ("amount", "amount_currency")
+        exclude = ("price_currency", "service")
 
-    price = PriceSerializer(source=("priceInfo"))
-    buyer = UserSerializer()
-    seller = UserSerializer()
+    buyer = UserSerializer(read_only=True)
+    seller = UserSerializer(read_only=True)
+    service_id = serializers.ReadOnlyField()
+    order_type = serializers.ReadOnlyField()
+
+    def create(self, validated_data):
+        """
+        create new order
+        """
+        service_id = self.context["view"].kwargs["service_id"]
+        if Order.objects.filter(service_id=service_id):
+            raise ValidationError("Order already exists. Kindly update")
+        service = Service.objects.get(id=service_id)
+        validated_data.pop(
+            "status", None
+        )  # prevent creating order with status set
+        buyer = self.context["request"].user
+        seller = service.seller
+        return Order.objects.create(
+            service=service, buyer=buyer, seller=seller, **validated_data
+        )
+
+    def validate_date_ending(self, value):
+        """
+        ensure ending time is a future date
+        """
+        if datetime.utcnow().replace(tzinfo=UTC) > value:
+            raise ValidationError("Ending date cannot be a past date")
+        return value
+
+    def validate_number_of_revisions(self, value):
+        """
+        ensure the number of revisions is less than or equal to 5
+        """
+        if value <= 5:
+            return value
+        raise ValidationError(
+            "Number of revision should be between less than or equal to 5"
+        )
+
+    def validate_attachment(self, value):
+        """
+        ensure unique urls added as attachment
+        """
+        attachments = set(value)  # prevent adding duplicate attachment urls
+        return list(attachments)
+
+    def update(self, instance, validated_data):
+        """
+        validate order details
+        """
+        status = validated_data.pop("status", None)
+        if status and not has_permission(
+            self.context["request"].user, "edit_order_status"
+        ):
+            raise PermissionDenied(
+                "Only users with required permissions can edit order status"
+            )
+        for (key, value) in validated_data.items():
+            setattr(instance, key, value)
+        instance.save()
+        return instance
 
 
 class ServiceRequestSerializer(serializers.ModelSerializer):

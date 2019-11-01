@@ -13,7 +13,11 @@ from quexl.apps.services.models import (
     Request,
     Payment,
 )
-from quexl.apps.services.permissions import IsSellerOrReadOnly, IsSellerOrBuyer
+from quexl.apps.services.permissions import (
+    IsSellerOrReadOnly,
+    IsSellerOrBuyer,
+    IsBuyer,
+)
 from quexl.apps.services.serializers import (
     ServicesSerializer,
     CategorySerializer,
@@ -48,8 +52,15 @@ class APIViewWrapper(RetrieveUpdateDestroyAPIView):
         obj.delete()
         return response.Response({}, status=status.HTTP_200_OK)
 
+    def get_queryset(self):
+        """
+        return given service_id instance
+        """
+        pk = self.kwargs.get(self.lookup_url_kwarg)
+        return Service.objects.filter(id=pk)
 
-class ServicesViewSet(ListCreateAPIView):
+
+class ServicesListCreateAPIView(ListCreateAPIView):
     """
     services view for listing and creating services
     """
@@ -73,13 +84,6 @@ class ServicesAPIView(APIViewWrapper, RetrieveUpdateDestroyAPIView):
     name = "service"
     pluralized_name = "services"
     lookup_url_kwarg = "service_id"
-
-    def get_queryset(self):
-        """
-        return given service_id instance
-        """
-        service_id = self.kwargs.get(self.lookup_url_kwarg)
-        return Service.objects.filter(id=service_id)
 
 
 class CategoryListCreateAPIView(ListCreateAPIView):
@@ -108,21 +112,17 @@ class CategoryUpdateDestroyAPIView(
     renderer_classes = (ServicesRenderer,)
     lookup_url_kwarg = "category_id"
 
-    def get_queryset(self):
-        """
-        return specific category
-        """
-        category_id = self.kwargs.get(self.lookup_url_kwarg)
-        return Category.objects.filter(id=category_id)
 
-
-class OrdersAPIView(ModelViewSet):
+class OrdersAPIView(ListCreateAPIView):
     """
     orders view
     """
 
+    name = "order"
+    pluralized_name = "orders"
     permission_classes = (IsSellerOrReadOnly, IsAuthenticated)
     serializer_class = OrdersSerializer
+    renderer_classes = (ServicesRenderer,)
     lookup_url_kwarg = "service_id"
 
     def get_queryset(self):
@@ -131,6 +131,30 @@ class OrdersAPIView(ModelViewSet):
         """
         service_id = self.kwargs.get(self.lookup_url_kwarg)
         return Order.objects.filter(service_id=service_id)
+
+
+class OrdersRetriveUpdateDestroyAPIView(
+    APIViewWrapper, RetrieveUpdateDestroyAPIView
+):
+    """
+    manage service orders
+    """
+
+    name = "order"
+    pluralized_name = "orders"
+    permission_classes = (IsBuyer, IsAuthenticated)
+    renderer_classes = (ServicesRenderer,)
+    serializer_class = OrdersSerializer
+    lookup_url_kwarg = "order_id"
+
+    def get_queryset(self):
+        """
+        return order of given service
+        """
+        order_id = self.kwargs.get(self.lookup_url_kwarg)
+        return Order.objects.filter(
+            id=order_id
+        )  # ignore service_id since order_id is unique
 
 
 class ServiceRequestAPIView(ModelViewSet):

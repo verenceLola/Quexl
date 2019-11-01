@@ -6,9 +6,10 @@ from quexl.apps.services.views import (
     CategoryListCreateAPIView,
     CategoryUpdateDestroyAPIView,
     OrdersAPIView,
-    ServicesViewSet,
+    ServicesListCreateAPIView,
     ServiceRequestAPIView,
     OrderPaymentsAPIView,
+    OrdersRetriveUpdateDestroyAPIView,
 )
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
@@ -19,7 +20,11 @@ seller_router = DefaultRouter()
 seller_router.register(r"sell/payments", OrderPaymentsAPIView)
 urlpatterns = [
     path("", include(seller_router.urls)),
-    path("sell/services", ServicesViewSet.as_view(), name="user services"),
+    path(
+        "sell/services",
+        ServicesListCreateAPIView.as_view(),
+        name="user services",
+    ),
     path(
         "sell/services/<str:service_id>",
         ServicesAPIView.as_view(),
@@ -37,8 +42,13 @@ urlpatterns = [
     ),
     path(
         "sell/services/<str:service_id>/orders",
-        OrdersAPIView.as_view({"get": "list"}),
-        name="service orders",
+        OrdersAPIView.as_view(),
+        name="list create service orders",
+    ),
+    path(
+        "sell/services/<str:service_id>/orders/<str:order_id>",
+        OrdersRetriveUpdateDestroyAPIView.as_view(),
+        name="retrieve, update, delete service order",
     ),
     path(
         "buy/services/request",

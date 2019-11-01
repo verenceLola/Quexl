@@ -25,3 +25,12 @@ class IsSellerOrBuyer(permissions.BasePermission):
 
         pdb.set_trace()
         return (request.user != obj.buyer) or (request.user != obj.seller)
+
+
+class IsBuyer(permissions.BasePermission):
+    """
+    ensure the user is seller
+    """
+
+    def has_object_permission(self, request, view, obj):
+        return request.user == obj.buyer

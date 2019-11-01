@@ -106,19 +106,21 @@ class Order(models.Model):
         primary_key=True,
         editable=False,
     )
-    seller = models.OneToOneField(
+    seller = models.ForeignKey(
         User, on_delete=models.CASCADE, related_name="order_seller"
     )
-    buyer = models.OneToOneField(
+    buyer = models.ForeignKey(
         User, on_delete=models.CASCADE, related_name="order_buyer"
     )
-    amount = MoneyField(
+    price = MoneyField(
         max_digits=19, decimal_places=4, default=0.0000, default_currency="USD"
     )
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     date_ending = models.DateTimeField()
-    number_of_revisions = models.PositiveIntegerField()
+    number_of_revisions = models.PositiveIntegerField(
+        default=0
+    )  # max of 5 revisions
     status = models.CharField(
         max_length=10, choices=STATUS_CHOICES, default="started"
     )
@@ -127,21 +129,18 @@ class Order(models.Model):
     order_type = models.CharField(
         max_length=10,
         choices=[("offer", "order offer"), ("proposal", "order proposal")],
+        default="offer",  # default value when selling service
     )
     attachment = ArrayField(
-        models.URLField(), size=5
+        models.URLField(null=True), size=5, default=list
     )  # allow a maximum of 5 attachments
-    buyer_requirements = models.TextField(max_length=300)
+    details = models.TextField(
+        max_length=300
+    )  # describe buyer_requirements if buying, or seller_deliverable when selling
+    # seller_deliverables = models.TextField(max_length=300, blank=True)
 
     def __str__(self):
         return self.description
-
-    @property
-    def priceInfo(self):
-        """
-        return price info: amount & currency
-        """
-        return self.amount
 
 
 class Request(models.Model):
