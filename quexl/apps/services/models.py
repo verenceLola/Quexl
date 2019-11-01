@@ -1,7 +1,7 @@
 from django.db import models
 from quexl.helpers.fancy_generator import fancy_id_generator
 from djmoney.models.fields import MoneyField
-from quexl.apps.authentication.models import User
+from quexl.apps.account.models import User
 from django.contrib.postgres.fields import ArrayField
 from mptt.models import TreeForeignKey, MPTTModel
 from django.utils.text import slugify
