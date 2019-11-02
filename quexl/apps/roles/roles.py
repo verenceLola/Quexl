@@ -13,6 +13,7 @@ class SiteAdmin(AbstractUserRole):
         "view_user_permissions": True,
         "revoke_user_permissions": True,
         "edit_order_status": True,
+        "edit_request_status": True,
     }
 
     @classmethod
@@ -32,6 +33,7 @@ class Developer(AbstractUserRole):
         "view_user_roles": True,
         "view_user_permissions": True,
         "edit_order_status": False,
+        "edit_request_status": False,
     }
 
     @classmethod

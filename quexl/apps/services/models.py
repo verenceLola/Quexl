@@ -124,7 +124,7 @@ class Order(models.Model):
     status = models.CharField(
         max_length=10, choices=STATUS_CHOICES, default="started"
     )
-    service = models.OneToOneField(Service, on_delete=models.CASCADE)
+    service = models.ForeignKey(Service, on_delete=models.CASCADE)
     description = models.TextField(max_length=300)
     order_type = models.CharField(
         max_length=10,
@@ -158,6 +158,7 @@ class Request(models.Model):
         primary_key=True,
         editable=False,
     )
+    name = models.CharField(max_length=50, blank=False)
     category = TreeForeignKey(
         "Category", on_delete=models.CASCADE, null=True, blank=True
     )
@@ -166,20 +167,15 @@ class Request(models.Model):
         max_digits=19, decimal_places=4, default=0.0000, default_currency="USD"
     )
     delivery_time = models.DateTimeField()
-    status = models.CharField(max_length=10, choices=STATUS_CHOICES)
-    buyer = models.OneToOneField(
+    status = models.CharField(
+        max_length=10, choices=STATUS_CHOICES, default="started"
+    )
+    buyer = models.ForeignKey(
         User, on_delete=models.CASCADE, related_name="request_buyer"
     )
-    date_created = models.DateTimeField(auto_now=True)
-    updated_at = models.DateTimeField(auto_now_add=True)
-    attached_files = ArrayField(models.URLField(), size=5)
-
-    @property
-    def priceInfo(self):
-        """
-        return price info: amount & currency
-        """
-        return self.price
+    date_created = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    attached_files = ArrayField(models.URLField(), size=5, default=list)
 
     def __str__(self):
         return self.description
@@ -218,12 +214,4 @@ class Payment(models.Model):
     status = models.CharField(max_length=10, choices=PAYMENT_STATUS)
 
     def __str__(self):
-        # import pdb; pdb.set_trace()
         return "%s %s" % (self.amount.currency, self.amount.amount.__str__())
-
-    @property
-    def priceInfo(self):
-        """
-        return price amount and currency
-        """
-        return self.amount

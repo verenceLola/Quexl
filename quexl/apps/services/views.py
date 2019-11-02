@@ -1,7 +1,6 @@
 """
 services views
 """
-from rest_framework.viewsets import ModelViewSet
 from rest_framework.generics import (
     ListCreateAPIView,
     RetrieveUpdateDestroyAPIView,
@@ -15,8 +14,8 @@ from quexl.apps.services.models import (
 )
 from quexl.apps.services.permissions import (
     IsSellerOrReadOnly,
-    IsSellerOrBuyer,
-    IsBuyer,
+    IsBuyerOrReadOnly,
+    IsBuyerOrSeller,
 )
 from quexl.apps.services.serializers import (
     ServicesSerializer,
@@ -28,9 +27,10 @@ from quexl.apps.services.serializers import (
 from rest_framework.permissions import IsAuthenticated
 from quexl.apps.services.renderers import ServicesRenderer
 from rest_framework import response, status
+from django.db.models import Q
 
 
-class APIViewWrapper(RetrieveUpdateDestroyAPIView):
+class RetrieveUpdateDestroyAPIViewWrapper(RetrieveUpdateDestroyAPIView):
     """
     prevent updating using PUT, define delete()
     """
@@ -52,13 +52,6 @@ class APIViewWrapper(RetrieveUpdateDestroyAPIView):
         obj.delete()
         return response.Response({}, status=status.HTTP_200_OK)
 
-    def get_queryset(self):
-        """
-        return given service_id instance
-        """
-        pk = self.kwargs.get(self.lookup_url_kwarg)
-        return Service.objects.filter(id=pk)
-
 
 class ServicesListCreateAPIView(ListCreateAPIView):
     """
@@ -73,7 +66,7 @@ class ServicesListCreateAPIView(ListCreateAPIView):
     serializer_class = ServicesSerializer
 
 
-class ServicesAPIView(APIViewWrapper, RetrieveUpdateDestroyAPIView):
+class ServicesAPIView(RetrieveUpdateDestroyAPIViewWrapper):
     """
     service view for updating and deleting a service
     """
@@ -84,6 +77,13 @@ class ServicesAPIView(APIViewWrapper, RetrieveUpdateDestroyAPIView):
     name = "service"
     pluralized_name = "services"
     lookup_url_kwarg = "service_id"
+
+    def get_queryset(self):
+        """
+        return given pk instance
+        """
+        pk = self.kwargs.get(self.lookup_url_kwarg)
+        return Service.objects.filter(id=pk)
 
 
 class CategoryListCreateAPIView(ListCreateAPIView):
@@ -99,9 +99,7 @@ class CategoryListCreateAPIView(ListCreateAPIView):
     renderer_classes = (ServicesRenderer,)
 
 
-class CategoryUpdateDestroyAPIView(
-    APIViewWrapper, RetrieveUpdateDestroyAPIView
-):
+class CategoryUpdateDestroyAPIView(RetrieveUpdateDestroyAPIViewWrapper):
     """
     categories view for updating and deleting categories
     """
@@ -111,6 +109,13 @@ class CategoryUpdateDestroyAPIView(
     serializer_class = CategorySerializer
     renderer_classes = (ServicesRenderer,)
     lookup_url_kwarg = "category_id"
+
+    def get_queryset(self):
+        """
+        return given pk instance
+        """
+        pk = self.kwargs.get(self.lookup_url_kwarg)
+        return Category.objects.filter(id=pk)
 
 
 class OrdersAPIView(ListCreateAPIView):
@@ -130,19 +135,20 @@ class OrdersAPIView(ListCreateAPIView):
         return orders for specified service
         """
         service_id = self.kwargs.get(self.lookup_url_kwarg)
-        return Order.objects.filter(service_id=service_id)
+        user = self.request.user
+        return Order.objects.filter(
+            Q(seller=user) | Q(buyer=user), service_id=service_id
+        )
 
 
-class OrdersRetriveUpdateDestroyAPIView(
-    APIViewWrapper, RetrieveUpdateDestroyAPIView
-):
+class OrdersRetriveUpdateDestroyAPIView(RetrieveUpdateDestroyAPIViewWrapper):
     """
     manage service orders
     """
 
     name = "order"
     pluralized_name = "orders"
-    permission_classes = (IsBuyer, IsAuthenticated)
+    permission_classes = (IsBuyerOrSeller, IsAuthenticated)
     renderer_classes = (ServicesRenderer,)
     serializer_class = OrdersSerializer
     lookup_url_kwarg = "order_id"
@@ -157,21 +163,46 @@ class OrdersRetriveUpdateDestroyAPIView(
         )  # ignore service_id since order_id is unique
 
 
-class ServiceRequestAPIView(ModelViewSet):
+class ServiceRequestAPIView(ListCreateAPIView):
     """
-    request service view
+    request service view for listing and creating service requests for buyers
     """
 
-    permission_classes = (IsSellerOrReadOnly, IsAuthenticated)
+    name = "request"
+    pluralized_name = "requests"
+    permission_classes = (IsAuthenticated,)
     queryset = Request.objects.all()
+    renderer_classes = (ServicesRenderer,)
     serializer_class = ServiceRequestSerializer
 
 
-class OrderPaymentsAPIView(ModelViewSet):
+class ServiceRequestRetrieveUpdateDestroyAPIView(
+    RetrieveUpdateDestroyAPIViewWrapper
+):
+    """
+    request service view for retrieving, updating and deleting a given request
+    """
+
+    name = "request"
+    pluralized_name = "requests"
+    permission_classes = (IsBuyerOrReadOnly, IsAuthenticated)
+    renderer_classes = (ServicesRenderer,)
+    serializer_class = ServiceRequestSerializer
+    lookup_url_kwarg = "request_id"
+
+    def get_queryset(self):
+        """
+        return given pk instance
+        """
+        pk = self.kwargs.get(self.lookup_url_kwarg)
+        return Request.objects.filter(id=pk)
+
+
+class OrderPaymentsAPIView(ListCreateAPIView):
     """
     order payments view
     """
 
-    permission_classes = (IsSellerOrBuyer, IsAuthenticated)
+    permission_classes = (IsBuyerOrReadOnly, IsAuthenticated)
     queryset = Payment.objects.all()
     serializer_class = PaymentSerializer

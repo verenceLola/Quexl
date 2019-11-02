@@ -15,22 +15,25 @@ class IsSellerOrReadOnly(permissions.BasePermission):
         return request.user == obj.seller
 
 
-class IsSellerOrBuyer(permissions.BasePermission):
+class IsBuyerOrReadOnly(permissions.BasePermission):
     """
-    esure user is either the seller or a buyer for a given payment
+    ensure the user is buyer or performing read-only request
     """
 
     def has_object_permission(self, request, view, obj):
-        import pdb
+        if request.method in permissions.SAFE_METHODS:
+            return True
+        return request.user == obj.buyer
 
-        pdb.set_trace()
-        return (request.user != obj.buyer) or (request.user != obj.seller)
 
-
-class IsBuyer(permissions.BasePermission):
+class IsBuyerOrSeller(permissions.BasePermission):
     """
     ensure the user is seller
     """
 
     def has_object_permission(self, request, view, obj):
+        if (
+            request.method in permissions.SAFE_METHODS
+        ):  # allow buyers or sellers to view orders made
+            return (request.user == obj.buyer) or (request.user == obj.seller)
         return request.user == obj.buyer

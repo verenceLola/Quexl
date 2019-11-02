@@ -54,11 +54,17 @@ class PriceSerializerWrapper(serializers.ModelSerializer):
         """
         priceInfo = self.initial_data["price"]
         try:
+            if int(priceInfo["amount"]) < 0:
+                raise ValidationError("Amount cannot be less than zero")
             money = DefaultMoney(
                 amount=priceInfo["amount"], currency=priceInfo["currency"]
             )
         except CurrencyDoesNotExist:
             raise ValidationError("Currency does not exist")
+        except KeyError:
+            raise ValidationError("Missing amount or currency info")
+        except ValueError:
+            raise ValidationError("Amount should be a positive integer")
         return money
 
 
@@ -143,7 +149,7 @@ class ServicesSerializer(PriceSerializerWrapper):
 
     category = CategorySerializer(read_only=True)
     seller = UserSerializer(read_only=True)
-    category_id = serializers.CharField(write_only=True, required=False)
+    category_id = serializers.CharField(write_only=True)
     created_at = serializers.DateTimeField(read_only=True)
     update_at = serializers.DateTimeField(read_only=True)
 
@@ -166,7 +172,8 @@ class ServicesSerializer(PriceSerializerWrapper):
         """
         validate user doesn't have service with same name
         """
-        if Service.objects.filter(name=value):
+        seller = self.context["request"].user
+        if Service.objects.filter(name=value, seller=seller):
             raise ValidationError(
                 "service with '%s' name elready exists" % value
             )
@@ -208,13 +215,13 @@ class OrdersSerializer(PriceSerializerWrapper):
         create new order
         """
         service_id = self.context["view"].kwargs["service_id"]
-        if Order.objects.filter(service_id=service_id):
+        buyer = self.context["request"].user
+        if Order.objects.filter(service_id=service_id, buyer=buyer):
             raise ValidationError("Order already exists. Kindly update")
         service = Service.objects.get(id=service_id)
         validated_data.pop(
             "status", None
         )  # prevent creating order with status set
-        buyer = self.context["request"].user
         seller = service.seller
         return Order.objects.create(
             service=service, buyer=buyer, seller=seller, **validated_data
@@ -262,7 +269,7 @@ class OrdersSerializer(PriceSerializerWrapper):
         return instance
 
 
-class ServiceRequestSerializer(serializers.ModelSerializer):
+class ServiceRequestSerializer(PriceSerializerWrapper):
     """
     serialize service request data
     """
@@ -271,9 +278,79 @@ class ServiceRequestSerializer(serializers.ModelSerializer):
         model = Request
         exclude = ("price_currency",)
 
-    price = PriceSerializer(source="priceInfo")
-    category = CategorySerializer()
-    buyer = UserSerializer()
+    category = CategorySerializer(required=False, read_only=True)
+    buyer = UserSerializer(read_only=True)
+    category_id = serializers.CharField(write_only=True)
+
+    def validate_attached_files(self, value):
+        """
+        ensure unique urls added as attached_files
+        """
+        attachments = set(value)  # prevent adding duplicate attachment urls
+        return list(attachments)
+
+    def validate_delivery_time(self, value):
+        """
+        ensure delivery_time is a future date
+        """
+        if datetime.utcnow().replace(tzinfo=UTC) > value:
+            raise ValidationError("Delivery date cannot be a past date")
+        return value
+
+    def validate_category_id(self, value):
+        """
+        validate category of a service request
+        """
+        try:
+            category = Category.objects.get(pk=value)
+        except Category.DoesNotExist:
+            raise ValidationError(
+                "Category with id '%s' does not exist" % value
+            )
+        return category
+
+    def validate_name(self, value):
+        """
+        validate user doesn't have request with same name
+        """
+        buyer = self.context["request"].user
+        if Request.objects.filter(name=value, buyer=buyer):
+            raise ValidationError(
+                "Request with '%s' name elready exists" % value
+            )
+        return value
+
+    def create(self, validated_data):
+        """
+        create and save a new service request with current user as the buyer
+        """
+        buyer = self.context["request"].user
+        category = validated_data.pop("category_id")
+        validated_data.pop(
+            "status", None
+        )  # prevent creating request with status set; use default status
+        return Request.objects.create(
+            category=category, buyer=buyer, **validated_data
+        )
+
+    def update(self, instance, validated_data):
+        """
+        validate and update request details
+        """
+        category = validated_data.pop("category_id", None)
+        status = validated_data.pop("status", None)
+        if status and not has_permission(
+            self.context["request"].user, "edit_request_status"
+        ):
+            raise PermissionDenied(
+                "Only users with required permissions can edit request status"
+            )
+        if category:
+            validated_data.update({"category": category})
+        for (key, value) in validated_data.items():
+            setattr(instance, key, value)
+        instance.save()
+        return instance
 
 
 class PaymentSerializer(serializers.ModelSerializer):

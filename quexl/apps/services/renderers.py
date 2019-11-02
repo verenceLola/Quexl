@@ -25,7 +25,7 @@ class ServicesRenderer(JSONRenderer):
         if render_context["request"].method == "GET":
             if render_context["kwargs"] == {}:
                 message = (
-                    "All %s"
+                    "All %s"  # TODO fix bug for single and all orders views
                     % render_context["view"].pluralized_name.capitalize()
                 )
             else:
