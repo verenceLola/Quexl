@@ -18,6 +18,7 @@ from rest_framework.exceptions import PermissionDenied
 from djmoney.money import DefaultMoney
 from moneyed.classes import CurrencyDoesNotExist
 from rolepermissions.checkers import has_permission
+from django.db import IntegrityError
 
 
 class PriceSerializer(serializers.Serializer):
@@ -52,7 +53,9 @@ class PriceSerializerWrapper(serializers.ModelSerializer):
         """
         validate price info
         """
-        priceInfo = self.initial_data["price"]
+        priceInfo = self.initial_data.get("price") or self.initial_data.get(
+            "amount"
+        )
         try:
             if int(priceInfo["amount"]) < 0:
                 raise ValidationError("Amount cannot be less than zero")
@@ -89,7 +92,9 @@ class CategorySerializer(serializers.ModelSerializer):
         )
         return serializer.data
 
-    def create(self, validated_data):
+    def create(
+        self, validated_data
+    ):  # TODO: fix permissions to ensure that only users with rewuired permissions can create a new category.  # noqa
         """
         create new category instance
         """
@@ -218,7 +223,12 @@ class OrdersSerializer(PriceSerializerWrapper):
         buyer = self.context["request"].user
         if Order.objects.filter(service_id=service_id, buyer=buyer):
             raise ValidationError("Order already exists. Kindly update")
-        service = Service.objects.get(id=service_id)
+        try:
+            service = Service.objects.get(id=service_id)
+        except Service.DoesNotExist:
+            raise ValidationError(
+                "Service id '%s' does not exist" % service_id
+            )
         validated_data.pop(
             "status", None
         )  # prevent creating order with status set
@@ -353,16 +363,54 @@ class ServiceRequestSerializer(PriceSerializerWrapper):
         return instance
 
 
-class PaymentSerializer(serializers.ModelSerializer):
+class PaymentSerializer(PriceSerializerWrapper):
     """
     serialize order payment data
     """
 
     class Meta:
         model = Payment
-        exclude = ("amount", "amount_currency")
+        exclude = ("amount_currency", "buyer", "seller")
 
-    paid = PriceSerializer(source="priceInfo")
-    order = OrdersSerializer()
-    seller = UserSerializer()
-    buyer = UserSerializer()
+    amount = PriceSerializer()
+    price = None  # remove price field from parent serializer
+    order = OrdersSerializer(read_only=True)
+    paid_to = UserSerializer(read_only=True, source="seller")
+    paid_by = UserSerializer(read_only=True, source="buyer")
+    cleared = serializers.BooleanField(read_only=True)
+
+    def validate_amount(self, value):
+        """
+        validate amount using parent validator
+        """
+        return super(PaymentSerializer, self).validate_price(value)
+
+    def validate(self, data):
+        """
+        validate payment data and add necessary info when creating payment
+        """
+        order_id = self.context["view"].kwargs.get("order_id")
+        try:
+            order = Order.objects.get(pk=order_id)
+        except Order.DoesNotExist:
+            raise ValidationError(
+                "Order with id '%s' does not exist" % order_id
+            )
+        buyer = order.buyer
+        if data.get("amount"):
+            if not order.price.currency == data.get("amount").currency:
+                raise ValidationError(
+                    "Please pay using '%s' currency" % order.price.currency
+                )
+        seller = order.seller
+        data.update({"buyer": buyer, "seller": seller, "order": order})
+        return data
+
+    def create(self, validated_data):
+        """
+        pay for an order
+        """
+        try:
+            return Payment.objects.create(**validated_data)
+        except IntegrityError:
+            raise ValidationError("Payment already made. Kindly update")

@@ -197,7 +197,7 @@ class Payment(models.Model):
         editable=False,
     )
     order = models.OneToOneField(Order, on_delete=models.CASCADE)
-    buyer = models.OneToOneField(
+    buyer = models.ForeignKey(
         User, on_delete=models.CASCADE, related_name="paid_by"
     )
     issued_at = models.DateTimeField(auto_now=True)
@@ -205,13 +205,22 @@ class Payment(models.Model):
     amount = MoneyField(
         max_digits=19, decimal_places=4, default=0.0000, default_currency="USD"
     )
-    seller = models.OneToOneField(
+    seller = models.ForeignKey(
         User, on_delete=models.CASCADE, related_name="paid_to"
     )
     payment_code = models.CharField(
         editable=False, default=fancy_id_generator, max_length=256
     )
-    status = models.CharField(max_length=10, choices=PAYMENT_STATUS)
+    status = models.CharField(
+        max_length=10, choices=PAYMENT_STATUS, default=VERIFIED
+    )
 
     def __str__(self):
         return "%s %s" % (self.amount.currency, self.amount.amount.__str__())
+
+    @property
+    def cleared(self):
+        """
+        return if the order payment is cleared or not
+        """
+        return self.amount > self.order.price

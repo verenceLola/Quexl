@@ -27,6 +27,7 @@ from quexl.apps.services.serializers import (
 from rest_framework.permissions import IsAuthenticated
 from quexl.apps.services.renderers import ServicesRenderer
 from rest_framework import response, status
+from rest_framework.exceptions import NotFound
 from django.db.models import Q
 
 
@@ -136,6 +137,10 @@ class OrdersAPIView(ListCreateAPIView):
         """
         service_id = self.kwargs.get(self.lookup_url_kwarg)
         user = self.request.user
+        try:
+            Service.objects.get(pk=service_id)
+        except Service.DoesNotExist:
+            raise NotFound("Service with id '%s' does not exist" % service_id)
         return Order.objects.filter(
             Q(seller=user) | Q(buyer=user), service_id=service_id
         )
@@ -203,6 +208,26 @@ class OrderPaymentsAPIView(ListCreateAPIView):
     order payments view
     """
 
-    permission_classes = (IsBuyerOrReadOnly, IsAuthenticated)
-    queryset = Payment.objects.all()
+    permission_classes = (
+        IsBuyerOrReadOnly,
+        IsAuthenticated,
+    )  # TODO: verify permission requirements
+    name = "payment"
+    pluralized_name = "payments"
     serializer_class = PaymentSerializer
+    renderer_classes = (ServicesRenderer,)
+    lookup_url_kwarg = "order_id"
+
+    def get_queryset(self):
+        """
+        return order payments
+        """
+        order_id = self.kwargs.get(self.lookup_url_kwarg)
+        user = self.request.user
+        try:
+            Order.objects.get(pk=order_id)
+        except Order.DoesNotExist:
+            raise NotFound("Order with id '%s' does not exist" % order_id)
+        return Payment.objects.filter(
+            Q(seller=user) | Q(buyer=user), order_id=order_id
+        )

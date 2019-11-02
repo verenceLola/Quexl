@@ -58,8 +58,8 @@ urlpatterns = [
         name="edit delete service request ",
     ),
     path(
-        "orders/<str:order_id>/payments",
+        "orders/<str:order_id>/payment",
         OrderPaymentsAPIView.as_view(),
-        name="order payments",
+        name="order payment",
     ),
 ]
