@@ -145,6 +145,7 @@ REST_FRAMEWORK = {
         # specifies a local custom authentication class
         "quexl.apps.authentication.backends.JWTAuthentication",
     ),
+    "EXCEPTION_HANDLER": "quexl.utils.exceptions.custom_exception_handler",
 }
 
 # Password validation

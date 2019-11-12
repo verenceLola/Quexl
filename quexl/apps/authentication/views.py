@@ -10,7 +10,6 @@ from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from quexl.apps.authentication.email import send_email
 from quexl.apps.authentication.backends import JWTAuthentication
-from quexl.helpers.endpoint_response import get_success_responses
 from .models import User
 from .renderers import UserJSONRenderer
 from .serializers import (
@@ -33,6 +32,7 @@ class RegistrationAPIView(GenericAPIView):
     permission_classes = (AllowAny,)
     renderer_classes = (UserJSONRenderer,)
     serializer_class = RegistrationSerializer
+    operation = "Signup"
 
     def post(self, request, **kwargs):
         """ Signup a new user """
@@ -49,20 +49,18 @@ class RegistrationAPIView(GenericAPIView):
         send_email(request, user)
         serializer.save()
 
-        response_data = {"username": username, "email": email}
-
-        return get_success_responses(
-            data=response_data,
-            message="Please confirm your Quexl account by clicking on the "
-            "link sent to your email account {}".format(email),
-            status_code=status.HTTP_201_CREATED,
+        return Response(
+            {
+                "message": "Please confirm your Quexl account by clicking on the "
+                "link sent to your email account {}".format(email)
+            },
+            status=status.HTTP_201_CREATED,
         )
 
     def get(self, request):
         return Response(
-            data={
-                "message": "Only POST requests are allowed to this endpoint."
-            }
+            {"message": "Only POST requests are allowed to this endpoint."},
+            status=status.HTTP_405_METHOD_NOT_ALLOWED,
         )
 
 
@@ -70,7 +68,7 @@ class UserActivationAPIView(GenericAPIView):
     """Activate a user after mail verification."""
 
     permission_classes = (AllowAny,)
-    renderer_classes = (UserJSONRenderer,)
+    operation = "Account activation"
 
     def get(self, request, token, *args, **kwargs):
         """ Method for getting user token and activating them. """
@@ -82,21 +80,21 @@ class UserActivationAPIView(GenericAPIView):
             user = User.objects.get(username=data["userdata"])
         except (User.DoesNotExist, jwt.exceptions.DecodeError):
             return Response(
-                data={"message": "Activation link is invalid."},
+                {"message": "Activation link is invalid."},
                 status=status.HTTP_400_BAD_REQUEST,
             )
         user.is_active = True
         user.save()
         return Response(
-            data={"message": "Account activated successfully."},
+            {"message": "Account activated successfully."},
             status=status.HTTP_200_OK,
         )
 
 
 class LoginAPIView(GenericAPIView):
     permission_classes = (AllowAny,)
-    renderer_classes = (UserJSONRenderer,)
     serializer_class = LoginSerializer
+    operation = "Login"
 
     def post(self, request):
         """Login a user"""
@@ -118,14 +116,11 @@ class LoginAPIView(GenericAPIView):
             "first_name": user.first_name,
             "last_name": user.last_name,
         }
-        user_data["token"] = JWTAuthentication.generate_token(
-            userdata=userdata
-        )
+        token = JWTAuthentication.generate_token(userdata=userdata)
 
-        return get_success_responses(
-            data=user_data,
-            message="You have successfully logged in",
-            status_code=status.HTTP_200_OK,
+        return Response(
+            {"message": "You have successfully logged in", "token": token},
+            status=status.HTTP_200_OK,
         )
 
 
@@ -133,7 +128,6 @@ class ForgotPasswordView(GenericAPIView):
     # This view handles sending the password reset request email.
     # We expect the user to enter an email that exists in the database
     permission_classes = (AllowAny,)
-    renderer_classes = (UserJSONRenderer,)
     serializer_class = ForgotPasswordSerializer
 
     def post(self, request):
@@ -182,7 +176,7 @@ class ForgotPasswordView(GenericAPIView):
             )
             return Response(
                 {
-                    "success": "An email has been sent to your inbox with a "
+                    "message": "An email has been sent to your inbox with a "
                     "password reset link."
                 },
                 status=status.HTTP_200_OK,
@@ -190,7 +184,10 @@ class ForgotPasswordView(GenericAPIView):
 
         except (KeyError, User.DoesNotExist):
             return Response(
-                {"error": "Missing or non-existing email."},
+                {
+                    "message": "Password Reset Request failed",
+                    "error": "Missing or non-existing email.",
+                },
                 status=status.HTTP_404_NOT_FOUND,
             )
 
@@ -199,6 +196,7 @@ class ResetPasswordView(GenericAPIView):
     # This is the view that changes the password.
     permission_classes = (AllowAny,)
     serializer_class = ResetPasswordSerializer
+    operation = "Password reset"
 
     def put(self, request, token, *args, **kwargs):
         try:
@@ -212,10 +210,9 @@ class ResetPasswordView(GenericAPIView):
             user = User.objects.get(email=email)
             user.set_password(new_password)
             user.save()
-            return get_success_responses(
-                message="Your password has been successfully changed",
-                data={"email": email},
-                status_code=status.HTTP_200_OK,
+            return Response(
+                {"message": "Your password has been successfully changed"},
+                status=status.HTTP_200_OK,
             )
         except jwt.PyJWTError:
             return Response(
@@ -229,36 +226,40 @@ class ResetPasswordView(GenericAPIView):
 
 class UserResourceAPIView(GenericAPIView):
     permission_classes = (IsAuthenticated,)
-    renderer_classes = (UserJSONRenderer,)
     serializer_class = UserSerializer
 
     def get(self, request, user_id, *args, **kwargs):
         # There is nothing to validate or save here. Instead, we just want the
         # serializer to handle turning our `User` object into something that
         # can be JSONified and sent to the client.
+        self.operation = "View user details"
         try:
             user = User.get_user_by_id(user_id=user_id)
             userdata = {
                 "id": user.id,
                 "email": user.email,
                 "username": user.username,
-                "first_name": user.first_name,
-                "last_name": user.last_name,
             }
-            return get_success_responses(
-                data=userdata,
-                message="User details fetched successfully",
-                status_code=status.HTTP_200_OK,
+            return Response(
+                {
+                    "message": "User details fetched successfully",
+                    "details": userdata,
+                },
+                status=status.HTTP_200_OK,
             )
 
         except (KeyError, User.DoesNotExist, AttributeError):
             return Response(
-                {"error": "That user id %s does not exist." % user_id},
+                {
+                    "message": "Failed to fetch user details",
+                    "error": "That user id %s does not exist." % user_id,
+                },
                 status=status.HTTP_404_NOT_FOUND,
             )
 
     def put(self, request, *args, **kwargs):
         new_data = request.data
+        self.operation = "Update user details"  # set operation name
         serializer = self.serializer_class(
             request.user, data=new_data, partial=True
         )
@@ -268,16 +269,13 @@ class UserResourceAPIView(GenericAPIView):
         for k, v in new_data.items():
             updated_fields.update({k: v})
 
-        data = {
-            "message": "Update successful",
-            "updated-fields": updated_fields,
-            "new-record": new_data,
-        }
-
-        return get_success_responses(
-            data=data,
-            message="User profile successfully updated",
-            status_code=status.HTTP_200_OK,
+        return Response(
+            {
+                "message": "User details successfully updated",
+                "updated-fields": updated_fields,
+                "new-record": new_data,
+            },
+            status=status.HTTP_200_OK,
         )
 
 
@@ -286,12 +284,11 @@ class SocialAuthView(GenericAPIView):
 
     permission_classes = (AllowAny,)
     serializer_class = SocialAuthSerializer
-    renderer_classes = (UserJSONRenderer,)
+    operation = "Social authentication"
 
     def post(self, request, *args, **kwargs):
         """Takes in provider and access_token to authenticate user"""
         serializer = self.serializer_class(data=request.data["authData"])
-
         serializer.is_valid(raise_exception=True)
         provider = serializer.data.get("provider")
         authenticated_user = (
@@ -340,9 +337,6 @@ class SocialAuthView(GenericAPIView):
             )
 
         if user and user.is_active:
-            email = user.email
-            username = user.username
-
             userdata = {
                 "id": user.id,
                 "email": user.email,
@@ -351,10 +345,11 @@ class SocialAuthView(GenericAPIView):
                 "last_name": user.last_name,
             }
             token = JWTAuthentication.generate_token(userdata=userdata)
-            user_data = {"username": username, "email": email, "token": token}
 
-            return get_success_responses(
-                data=user_data,
-                message="You have successfully logged in",
-                status_code=status.HTTP_200_OK,
+            return Response(
+                {
+                    "message": "You have successfully logged in.",
+                    "token": token,
+                },
+                status=status.HTTP_200_OK,
             )

@@ -2,6 +2,7 @@ from rest_framework.generics import GenericAPIView
 from rest_framework.permissions import IsAuthenticated
 from rolepermissions.roles import get_user_roles, assign_role, remove_role
 from rolepermissions.checkers import has_permission
+from rest_framework.response import Response
 from rolepermissions.exceptions import (
     RoleDoesNotExist,
     RolePermissionScopeException,
@@ -33,9 +34,14 @@ class UserRoleAPIView(GenericAPIView):
         assign user roles
         """
         role = request.data.get("role", None)
+        self.operation = "Assign user role"  # specify view operation
         if not role:
-            return get_error_response(
-                "Missing role field", status_code=status.HTTP_400_BAD_REQUEST
+            return Response(
+                {
+                    "message": "%s failed" % self.operation,
+                    "error": "Missing role field",
+                },
+                status=status.HTTP_400_BAD_REQUEST,
             )
         try:
             if has_permission(request.user, "assign_user_roles"):
@@ -49,16 +55,19 @@ class UserRoleAPIView(GenericAPIView):
                 )
             else:
                 return get_error_response(
+                    "%s failed" % self.operation,
                     "You don't have permission to assign roles",
                     status_code=status.HTTP_403_FORBIDDEN,
                 )
         except get_user_model().DoesNotExist:
             return get_error_response(
+                "%s failed" % self.operation,
                 "User with id %s does not exist" % user_id,
                 status_code=status.HTTP_404_NOT_FOUND,
             )
         except RoleDoesNotExist:
             return get_error_response(
+                "%s failed" % self.operation,
                 "Role named %s does not exist" % role,
                 status_code=status.HTTP_404_NOT_FOUND,
             )
@@ -67,6 +76,7 @@ class UserRoleAPIView(GenericAPIView):
         """"
         get user roles
         """
+        self.operation = "View user roles"
         try:
             if has_permission(request.user, "view_user_roles"):
                 user = get_user_model().objects.get(id=user_id)
@@ -80,6 +90,7 @@ class UserRoleAPIView(GenericAPIView):
                     )
                     if len(serializer.data) > 0
                     else get_error_response(
+                        "%s failed" % self.operation,
                         "User does not have any roles",
                         status_code=status.HTTP_200_OK,
                     )
@@ -96,6 +107,7 @@ class UserRoleAPIView(GenericAPIView):
                     )
                     if len(serializer.data) > 0
                     else get_error_response(
+                        "%s failed" % self.operation,
                         "You don't have any roles",
                         status_code=status.HTTP_200_OK,
                     )
@@ -103,6 +115,7 @@ class UserRoleAPIView(GenericAPIView):
 
         except get_user_model().DoesNotExist:
             return get_error_response(
+                "%s failed" % self.operation,
                 "User with id %s does not exist" % user_id,
                 status_code=status.HTTP_404_NOT_FOUND,
             )
@@ -112,9 +125,12 @@ class UserRoleAPIView(GenericAPIView):
         remove user role
         """
         role = request.data.get("role", None)
+        self.operation = "Remove user role"
         if not role:
             return get_error_response(
-                "Missing role field", status_code=status.HTTP_400_BAD_REQUEST
+                "%s failed" % self.operation,
+                "Missing role field",
+                status_code=status.HTTP_400_BAD_REQUEST,
             )
         try:
             if has_permission(request.user, "remove_user_roles"):
@@ -128,16 +144,19 @@ class UserRoleAPIView(GenericAPIView):
                 )
             else:
                 return get_error_response(
+                    "%s failed" % self.operation,
                     "You don't have permission to remove user roles",
                     status_code=status.HTTP_403_FORBIDDEN,
                 )
         except get_user_model().DoesNotExist:
             return get_error_response(
+                "%s failed" % self.operation,
                 "User with id %s does not exist" % user_id,
                 status_code=status.HTTP_404_NOT_FOUND,
             )
         except RoleDoesNotExist:
             return get_error_response(
+                "%s failed" % self.operation,
                 "Role named %s does not exist" % role,
                 status_code=status.HTTP_404_NOT_FOUND,
             )
@@ -154,6 +173,7 @@ class PermissionsAPIView(GenericAPIView):
         """
         get user permissions
         """
+        self.operation = "View user permissions"  # specify view operation
         try:
             if has_permission(request.user, "view_user_permissions"):
                 user = get_user_model().objects.get(id=user_id)
@@ -166,6 +186,7 @@ class PermissionsAPIView(GenericAPIView):
                     )
                     if perms
                     else get_error_response(
+                        "%s failed" % self.operation,
                         "User does not have any permissions assigned",
                         status_code=status.HTTP_200_OK,
                     )
@@ -180,12 +201,14 @@ class PermissionsAPIView(GenericAPIView):
                     )
                     if perms
                     else get_error_response(
+                        "%s failed" % self.operation,
                         "You don't have any permissions",
                         status_code=status.HTTP_200_OK,
                     )
                 )
         except get_user_model().DoesNotExist:
             return get_error_response(
+                "%s failed" % self.operation,
                 "User with id %s does not exist" % user_id,
                 status_code=status.HTTP_404_NOT_FOUND,
             )
@@ -194,9 +217,11 @@ class PermissionsAPIView(GenericAPIView):
         """
         assign user permissions
         """
+        self.operation = "Assign user permission"
         permission = request.data.get("permission")
         if not permission:
             return get_error_response(
+                "%s failed" % self.operation,
                 "Missing permission field",
                 status_code=status.HTTP_400_BAD_REQUEST,
             )
@@ -211,16 +236,19 @@ class PermissionsAPIView(GenericAPIView):
                 )
             else:
                 return get_error_response(
+                    "%s failed" % self.operation,
                     "You do not have permission to assign user permissions",
                     status_code=status.HTTP_403_FORBIDDEN,
                 )
         except get_user_model().DoesNotExist:
             return get_error_response(
+                "%s failed" % self.operation,
                 "User with id %s does not exist" % user_id,
                 status_code=status.HTTP_404_NOT_FOUND,
             )
         except RolePermissionScopeException:
             return get_error_response(
+                "%s failed" % self.operation,
                 "User missing required role(s) for %s permission" % permission,
                 status_code=status.HTTP_400_BAD_REQUEST,
             )
@@ -229,9 +257,11 @@ class PermissionsAPIView(GenericAPIView):
         """
         revoke user permissions
         """
+        self.operation = "Revoke user permission"
         permission = request.data.get("permission")
         if not permission:
             return get_error_response(
+                "%s failed" % self.operation,
                 "Missing permission field",
                 status_code=status.HTTP_400_BAD_REQUEST,
             )
@@ -246,16 +276,19 @@ class PermissionsAPIView(GenericAPIView):
                 )
             else:
                 return get_error_response(
+                    "%s failed" % self.operation,
                     "You do not have permission to revoke user permissions",
                     status_code=status.HTTP_403_FORBIDDEN,
                 )
         except get_user_model().DoesNotExist:
             return get_error_response(
+                "%s failed" % self.operation,
                 "User with id %s does not exist" % user_id,
                 status_code=status.HTTP_404_NOT_FOUND,
             )
         except RolePermissionScopeException:
             return get_error_response(
+                "%s failed" % self.operation,
                 "User missing required role(s) for %s permission" % permission,
                 status_code=status.HTTP_400_BAD_REQUEST,
             )
