@@ -46,9 +46,9 @@ def test_get_user_roles_for_non_existing_user(
     request = client.get(
         roles_url, HTTP_AUTHORIZATION="Bearer " + access_token
     )
+    assert request.data["message"] == "View user roles failed"
     assert (
-        request.data["message"]
-        == "User with id non-existing-id does not exist"
+        request.data["error"] == "User with id non-existing-id does not exist"
     )
     assert request.status_code == 404
 
@@ -68,9 +68,8 @@ def test_assign_user_roles_with_inadequest_permisions(
         HTTP_AUTHORIZATION="Bearer " + access_token,
     )
     assert request.status_code == 403
-    assert (
-        request.data["message"] == "You don't have permission to assign roles"
-    )
+    assert request.data["error"] == "You don't have permission to assign roles"
+    assert request.data["message"] == "Assign user role failed"
 
 
 def test_assign_role_to_non_existing_user(
@@ -88,9 +87,9 @@ def test_assign_role_to_non_existing_user(
     )
     assert request.status_code == 404
     assert (
-        request.data["message"]
-        == "User with id non-existing-id does not exist"
+        request.data["error"] == "User with id non-existing-id does not exist"
     )
+    assert request.data["message"] == "Assign user role failed"
 
 
 def test_assign_user_role_as_superuser(
@@ -125,7 +124,8 @@ def test_assign_role_without_role_data(
     request = client.post(
         roles_url, HTTP_AUTHORIZATION="Bearer " + access_token
     )
-    assert request.data["message"] == "Missing role field"
+    assert request.data["error"] == "Missing role field"
+    assert request.data["message"] == "Assign user role failed"
     assert request.status_code == 400
 
 
@@ -145,9 +145,9 @@ def test_assign_non_existing_user_role(
     )
     assert request.status_code == 404
     assert (
-        request.data["message"]
-        == "Role named non-existing-role does not exist"
+        request.data["error"] == "Role named non-existing-role does not exist"
     )
+    assert request.data["message"] == "Assign user role failed"
 
 
 def test_delete_role_for_non_existing_user_id(
@@ -166,9 +166,10 @@ def test_delete_role_for_non_existing_user_id(
     )
     assert request.status_code == 404
     assert (
-        request.data["message"]
+        request.data["error"]
         == "User with id non-existing-user-id does not exist"
     )
+    assert request.data["message"] == "Remove user role failed"
 
 
 def test_delete_non_existing_role(
@@ -187,9 +188,9 @@ def test_delete_non_existing_role(
         HTTP_AUTHORIZATION="Bearer " + access_token,
     )
     assert (
-        request.data["message"]
-        == "Role named non-existing-role does not exist"
+        request.data["error"] == "Role named non-existing-role does not exist"
     )
+    assert request.data["message"] == "Remove user role failed"
 
 
 def test_delete_user_role_with_inadequete_permission(
@@ -209,9 +210,10 @@ def test_delete_user_role_with_inadequete_permission(
     )
     assert request.status_code == 403
     assert (
-        request.data["message"]
+        request.data["error"]
         == "You don't have permission to remove user roles"
     )
+    assert request.data["message"] == "Remove user role failed"
 
 
 def test_remove_user_role(
@@ -252,7 +254,8 @@ def test_remove_role_without_role_field(
         HTTP_AUTHORIZATION="Bearer " + access_token,
     )
     assert request.status_code == 400
-    assert request.data["message"] == "Missing role field"
+    assert request.data["message"] == "Remove user role failed"
+    assert request.data["error"] == "Missing role field"
 
 
 def test_get_user_permissions_as_superuser(
@@ -267,9 +270,9 @@ def test_get_user_permissions_as_superuser(
     request = client.get(perm_url, HTTP_AUTHORIZATION="Bearer " + access_token)
     assert request.status_code == 200
     assert (
-        request.data["message"]
-        == "User does not have any permissions assigned"
+        request.data["error"] == "User does not have any permissions assigned"
     )
+    assert request.data["message"] == "View user permissions failed"
     assign_role(user, "site_admin")
     request = client.get(perm_url, HTTP_AUTHORIZATION="Bearer " + access_token)
     assert request.data["message"] == "User has the following permmissions"
@@ -286,7 +289,8 @@ def test_get_user_permissions_with_inadequate_permssions(
     perm_url = reverse("roles:user permissions", args=[user.id])
     request = client.get(perm_url, HTTP_AUTHORIZATION="Bearer " + access_token)
     assert request.status_code == 200
-    assert request.data["message"] == "You don't have any permissions"
+    assert request.data["message"] == "View user permissions failed"
+    assert request.data["error"] == "You don't have any permissions"
 
 
 def test_get_permission_for_non_existing_user(
@@ -300,9 +304,10 @@ def test_get_permission_for_non_existing_user(
     request = client.get(perm_url, HTTP_AUTHORIZATION="Bearer " + access_token)
     assert request.status_code == 404
     assert (
-        request.data["message"]
+        request.data["error"]
         == "User with id non-existing-user-id does not exist"
     )
+    assert request.data["message"] == "View user permissions failed"
 
 
 def test_assign_permission_with_missing_permission_field(
@@ -318,7 +323,8 @@ def test_assign_permission_with_missing_permission_field(
         perm_url, HTTP_AUTHORIZATION="Bearer " + access_token
     )
     assert request.status_code == 400
-    assert request.data["message"] == "Missing permission field"
+    assert request.data["error"] == "Missing permission field"
+    assert request.data["message"] == "Assign user permission failed"
 
 
 def test_assign_permission_as_superuser(
@@ -360,9 +366,10 @@ def test_assign_permission_with_inadequate_permissions(
     )
     assert request.status_code == 403
     assert (
-        request.data["message"]
+        request.data["error"]
         == "You do not have permission to assign user permissions"
     )
+    assert request.data["message"] == "Assign user permission failed"
 
 
 def test_assign_permission_to_non_existing_user(
@@ -380,9 +387,10 @@ def test_assign_permission_to_non_existing_user(
     )
     assert request.status_code == 404
     assert (
-        request.data["message"]
+        request.data["error"]
         == "User with id non-existing-user-id does not exist"
     )
+    assert request.data["message"] == "Assign user permission failed"
 
 
 def test_assign_wrong_permission_as_superuser(
@@ -401,9 +409,10 @@ def test_assign_wrong_permission_as_superuser(
     )
     assert request.status_code == 400
     assert (
-        request.data["message"]
+        request.data["error"]
         == "User missing required role(s) for view_user_roles permission"
     )
+    assert request.data["message"] == "Assign user permission failed"
 
 
 def test_delete_permission_with_missing_permission_field(
@@ -421,7 +430,8 @@ def test_delete_permission_with_missing_permission_field(
         HTTP_AUTHORIZATION="Bearer " + access_token,
     )
     assert request.status_code == 400
-    assert request.data["message"] == "Missing permission field"
+    assert request.data["error"] == "Missing permission field"
+    assert request.data["message"] == "Revoke user permission failed"
 
 
 def test_revoke_permission_with_insuffient_permissions(
@@ -441,9 +451,10 @@ def test_revoke_permission_with_insuffient_permissions(
     )
     assert request.status_code == 403
     assert (
-        request.data["message"]
+        request.data["error"]
         == "You do not have permission to revoke user permissions"
     )
+    assert request.data["message"] == "Revoke user permission failed"
 
 
 def test_revoke_permission_non_existing_user(
@@ -462,16 +473,17 @@ def test_revoke_permission_non_existing_user(
     )
     assert request.status_code == 404
     assert (
-        request.data["message"]
+        request.data["error"]
         == "User with id non-existing-user-id does not exist"
     )
+    assert request.data["message"] == "Revoke user permission failed"
 
 
 def test_revoke_wrong_permissiong_for_user_role(
     client, generate_superuser_access_token, create_db_user
 ):
     """
-    test tevoke wrong user permssion
+    test revoke wrong user permssion
     """
     user = create_db_user
     perm_url = reverse("roles:user permissions", args=[user.id])
@@ -484,9 +496,10 @@ def test_revoke_wrong_permissiong_for_user_role(
     )
     assert request.status_code == 400
     assert (
-        request.data["message"]
+        request.data["error"]
         == "User missing required role(s) for invalid_role_permission permission"
     )
+    assert request.data["message"] == "Revoke user permission failed"
 
 
 def test_revoke_permission_as_superuser(

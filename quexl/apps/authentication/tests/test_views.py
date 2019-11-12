@@ -11,7 +11,6 @@ from .fixtures import (
     invalid_password_user_data,
     long_password_user_data,
     long_password_user_data_response,
-    signup_user_GET_response,
     login_failed_response,
     invalid_login_password,
     invalid_login_email,
@@ -57,7 +56,9 @@ def test_signup_user_GET(client):
     """
     signup_url = reverse("authentication:user_signup")
     response = client.get(signup_url)
-    assert response.data == signup_user_GET_response["response"]
+    assert (
+        b"Only POST requests are allowed to this endpoint." in response.content
+    )
 
 
 @pytest.mark.parametrize(
@@ -88,7 +89,7 @@ def test_user_login(client, create_db_user, login_details, expected_response):
     "reset_token, expected_response",
     [
         (valid_reset_token, reset_password_response),
-        ("ivalidtoke", reset_password_invalid_token_response),
+        ("invalidtoken", reset_password_invalid_token_response),
     ],
 )
 def test_reset_password(
@@ -111,7 +112,7 @@ def test_forgot_password(client, create_db_user):
     forgot_password_url = reverse("authentication:forgot_password")
     response = client.post(forgot_password_url, {"email": user.email})
     assert response.data == {
-        "success": "An email has been sent to your inbox with a password reset link."
+        "message": "An email has been sent to your inbox with a password reset link."
     }
     assert response.status_code == 200
 
@@ -123,7 +124,8 @@ def test_forgot_password_with_invalid_email(client):
     """
     forgot_password_url = reverse("authentication:forgot_password")
     response = client.post(forgot_password_url, {"email": "wrong@email.com"})
-    assert response.data == {"error": "Missing or non-existing email."}
+    assert response.data["error"] == "Missing or non-existing email."
+    assert response.data["message"] == "Password Reset Request failed"
     assert response.status_code == 404
 
 
@@ -135,7 +137,8 @@ def test_get_user_info(client, generate_access_token1):
     user_url = reverse("authentication:user", args=[user.id])
     response = client.get(user_url, HTTP_AUTHORIZATION="Bearer " + token)
     assert response.data["message"] == "User details fetched successfully"
-    assert response.data["data"]["id"] == user.id
+    assert response.data["details"]["id"] == user.id
+    assert response.data["details"]["username"] == user.username
     assert response.status_code == 200
 
 
@@ -148,7 +151,8 @@ def test_get_user_with_invalid_id(client, generate_access_token1):
         "authentication:user", args=[456]
     )  # non existing user id
     response = client.get(user_url, HTTP_AUTHORIZATION="Bearer " + token)
-    assert response.data == {"error": "That user id %d does not exist." % 456}
+    assert response.data["error"] == "That user id %d does not exist." % 456
+    assert response.data["message"] == "Failed to fetch user details"
     assert response.status_code == 404
 
 
@@ -167,6 +171,6 @@ def test_edit_user_info(client, generate_access_token1, django_user_model):
     )
     print(response.data)
     assert response.status_code == 200
-    assert response.data["message"] == "User profile successfully updated"
+    assert response.data["message"] == "User details successfully updated"
     updated_user = django_user_model.objects.get(pk=user.id)
     assert updated_user.email != user.email

@@ -28,6 +28,7 @@ class RegistrationSerializer(serializers.ModelSerializer):
                 message="Email address already exists",
             )
         ],
+        error_messages={"invalid": "Enter a valid email address"},
     )
 
     # Ensure that username is unique, does not exist,

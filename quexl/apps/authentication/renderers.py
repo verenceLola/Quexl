@@ -1,6 +1,7 @@
 import json
 
 from rest_framework.renderers import JSONRenderer
+from rest_framework import status
 
 
 class UserJSONRenderer(JSONRenderer):
@@ -15,12 +16,11 @@ class UserJSONRenderer(JSONRenderer):
         # or something similar), `data` will contain an `errors` key. We want
         # the default JSONRenderer to handle rendering errors, so we need to
         # check for this case.
-        errors = data.get("errors", None)
-
-        if errors:
-            # As mentioned about, we will let the default JSONRenderer handle
-            # rendering errors.
-
-            return super(UserJSONRenderer, self).render(data)
-
-        return json.dumps({"response": data})
+        status_code = renderer_context["response"].status_code
+        return (
+            json.dumps(data)
+            if status.is_success(status_code)
+            else super(UserJSONRenderer, self).render(
+                {"message": data.pop("message"), "errors": data}
+            )
+        )
