@@ -27,6 +27,7 @@ from .fixtures import (
     missing_password_login,
     missing_email_login_response,
     missing_password_login_response,
+    invalid_login_email_response,
 )
 
 
@@ -64,7 +65,7 @@ def test_signup_user_GET(client):
 @pytest.mark.parametrize(
     "login_details, expected_response",
     [
-        (invalid_login_email, login_failed_response),
+        (invalid_login_email, invalid_login_email_response),
         (invalid_login_password, login_failed_response),
         (blank_email_login, blank_email_login_response),
         (blank_password_login, blank_password_login_response),
@@ -82,7 +83,8 @@ def test_user_login(client, create_db_user, login_details, expected_response):
     if response.status_code == 200:
         assert response.data["message"] == expected_response
     else:
-        assert response.data == expected_response
+        assert expected_response["message"].encode() in response.content
+        assert expected_response["error"].encode() in response.content
 
 
 @pytest.mark.parametrize(

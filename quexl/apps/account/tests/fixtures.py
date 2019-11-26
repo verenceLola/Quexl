@@ -87,30 +87,32 @@ missing_email_login = update_login_details("email", None)
 missing_password_login = update_login_details("password", None)
 login_failed_response = {
     "message": "Login failed. Fix the error(s) below",
-    "error": [
-        "Either your email or password isn’t right. Double check them, or"
-        " reset your password to log in. "
-    ],
+    "error": "Password isn’t right. Double check , or reset your password to log in. ",
+}
+
+invalid_login_email_response = {
+    "error": "User with email wrong@email.com not found.",
+    "message": "Login failed. Fix the error(s) below",
 }
 
 blank_email_login_response = {
     "message": "Login failed. Fix the error(s) below",
-    "email": ["This field may not be blank."],
+    "error": "This field may not be blank.",
 }
 
 missing_email_login_response = {
     "message": "Login failed. Fix the error(s) below",
-    "email": ["This field may not be null."],
+    "error": "This field may not be null.",
 }
 
 missing_password_login_response = {
     "message": "Login failed. Fix the error(s) below",
-    "password": ["This field may not be null."],
+    "error": "This field may not be null.",
 }
 
 blank_password_login_response = {
     "message": "Login failed. Fix the error(s) below",
-    "password": ["This field may not be blank."],
+    "error": "This field may not be blank.",
 }
 
 valid_reset_token = JWTAuthentication().generate_reset_token("user1@quexl.com")

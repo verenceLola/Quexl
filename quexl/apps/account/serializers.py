@@ -90,41 +90,43 @@ class LoginSerializer(serializers.Serializer):
         """
         validate details
         """
-        email = data.get("email", None)
+        user = data.get("email", None)  # get user object as key 'email'
+        email = user.email
         password = data.get("password", None)
-
-        if email is None:
-            raise serializers.ValidationError(
-                "Your email address is required to log in."
-            )
-
         if not password:
             raise serializers.ValidationError(
                 "Kindly enter your password to log in."
             )
 
-        user = authenticate(email=email, password=password)
-
-        # `authenticate` will return `None`. Raise an exception in this case.
-        if user is None:
-            raise serializers.ValidationError(
-                "Either your email or password isn’t right. Double check "
-                "them, or reset your password to log in. "
-            )
+        auth_user = authenticate(email=email, password=password)
 
         if not user.is_active:
             raise serializers.ValidationError(
                 "Your account is inactive. Kindly check your email for an "
                 "activation link to activate "
             )
+        if auth_user is None:
+            raise serializers.ValidationError(
+                {
+                    "password": "Password isn’t right. Double check "
+                    ", or reset your password to log in. "
+                }
+            )
+
         token = JWTAuthentication.generate_token(email)
 
-        """
-        The `validate` method should return a dictionary of validated data.
-        This is the data that is passed to the `create` and `update` methods
-        that we will see later on.
-        """
         return {"email": user.email, "username": user.username, "token": token}
+
+    def validate_email(self, value):
+        """
+        validate user password
+        """
+        user = User.get_user(value)
+        if not user:
+            raise serializers.ValidationError(
+                f"User with email {value} not found."
+            )
+        return user  # return user object to reduce unnecessary db queries
 
 
 class ForgotPasswordSerializer(serializers.Serializer):

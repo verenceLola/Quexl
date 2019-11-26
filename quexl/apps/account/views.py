@@ -95,6 +95,7 @@ class LoginAPIView(GenericAPIView):
     permission_classes = (AllowAny,)
     serializer_class = LoginSerializer
     operation = "Login"
+    renderer_classes = (UserJSONRenderer,)
 
     def post(self, request):
         """Login a user"""
@@ -106,6 +107,10 @@ class LoginAPIView(GenericAPIView):
         user = {"email": email, "password": password}
         serializer = self.serializer_class(data=user)
         serializer.is_valid(raise_exception=True)
+        # if not serializer.is_valid():
+        #     return Response({
+        #         'errors': serializer.errors
+        #     })
         user_data = serializer.data
 
         user = User.get_user(user_data["email"])
@@ -152,7 +157,7 @@ class ForgotPasswordView(GenericAPIView):
 
             # format url and send it in the reset email link
 
-            # TODO: Configure link to refer upon password reset
+            # TODO: Configure link to referer upon password reset
             client_url = request.META.get(
                 "HTTP_REFERER", request.build_absolute_uri("/").strip("/")
             )
