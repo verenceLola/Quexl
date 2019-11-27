@@ -27,6 +27,8 @@ urlpatterns = [
         "social-auth/login", views.SocialAuthView.as_view(), name="social_auth"
     ),
     path(
-        "user/<str:user_id>", views.UserResourceAPIView.as_view(), name="user"
+        "users/<str:user_id>",
+        views.UserResourceAPIView.as_view(),
+        name="user-details",
     ),
 ]
