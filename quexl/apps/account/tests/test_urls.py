@@ -6,6 +6,7 @@ from quexl.apps.account.views import (
     UserActivationAPIView,
     ResetPasswordView,
     UserResourceAPIView,
+    AuthMeRetriveAPIView,
 )
 
 
@@ -54,3 +55,11 @@ def test_user_resource_url_resolves():
     """
     url = reverse("authentication:user", args=[1])
     assert resolve(url).func.view_class == UserResourceAPIView
+
+
+def test_me_url_resolves():
+    """
+    test getting current user url resolves
+    """
+    url = reverse("authentication:me")
+    assert resolve(url).func.view_class == AuthMeRetriveAPIView

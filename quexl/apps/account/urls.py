@@ -8,6 +8,7 @@ from .views import (
     ForgotPasswordView,
     ResetPasswordView,
     SocialAuthView,
+    AuthMeRetriveAPIView,
 )
 
 app_name = "authentication"
@@ -15,6 +16,7 @@ app_name = "authentication"
 urlpatterns = [
     path("auth/register", RegistrationAPIView.as_view(), name="user_signup"),
     path("auth/login", LoginAPIView.as_view(), name="user_login"),
+    path("auth/me", AuthMeRetriveAPIView.as_view(), name="me"),
     path(
         "auth/<str:token>",
         UserActivationAPIView.as_view(),

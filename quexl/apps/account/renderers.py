@@ -21,6 +21,9 @@ class UserJSONRenderer(JSONRenderer):
             json.dumps(data)
             if status.is_success(status_code)
             else super(UserJSONRenderer, self).render(
-                {"message": data.pop("message"), "errors": data}
+                {
+                    "message": data.pop("message", "Fix the error(s) below"),
+                    "errors": data,
+                }
             )
         )

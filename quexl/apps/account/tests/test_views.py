@@ -171,8 +171,31 @@ def test_edit_user_info(client, generate_access_token1, django_user_model):
         HTTP_AUTHORIZATION="Bearer " + token,
         content_type="application/json",
     )
-    print(response.data)
     assert response.status_code == 200
     assert response.data["message"] == "User details successfully updated"
     updated_user = django_user_model.objects.get(pk=user.id)
     assert updated_user.email != user.email
+
+
+def test_getting_current_user_info_without_auth(client):
+    """
+    test getting current user info with authentication
+    """
+    me_url = reverse("authentication:me")
+    response = client.get(me_url)
+    assert response.status_code == 401
+    assert (
+        "Authentication credentials were not provided.".encode()
+        in response.content
+    )
+
+
+def test_getting_current_user_info_with_auth(client, generate_access_token1):
+    """
+    test getting current user info with credentials/ auth
+    """
+    token, user = generate_access_token1
+    me_url = reverse("authentication:me")
+    response = client.get(me_url, HTTP_AUTHORIZATION=f"Bearer {token}")
+    assert response.status_code == 200
+    assert user.id.encode() in response.content
