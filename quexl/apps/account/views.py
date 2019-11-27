@@ -5,7 +5,8 @@ from django.conf import settings
 from django.core.mail import send_mail
 from django.template.loader import render_to_string
 from rest_framework import status
-from rest_framework.generics import GenericAPIView
+from django.utils.timezone import now
+from rest_framework.generics import GenericAPIView, RetrieveAPIView
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from quexl.apps.account.email import send_email
@@ -19,6 +20,7 @@ from .serializers import (
     ForgotPasswordSerializer,
     UserSerializer,
     SocialAuthSerializer,
+    MeSerializer,
 )
 from social_core.backends.oauth import BaseOAuth1, BaseOAuth2
 from social_core.exceptions import MissingBackend
@@ -120,7 +122,9 @@ class LoginAPIView(GenericAPIView):
             "username": user.username,
         }
         token = JWTAuthentication.generate_token(userdata=userdata)
-
+        # update user last login
+        user.last_login = now()
+        user.save()
         return Response(
             {"message": "You have successfully logged in", "token": token},
             status=status.HTTP_200_OK,
@@ -354,3 +358,20 @@ class SocialAuthView(GenericAPIView):
                 },
                 status=status.HTTP_200_OK,
             )
+
+
+class AuthMeRetriveAPIView(RetrieveAPIView):
+    """
+    return the current user info
+    """
+
+    renderer_classes = (UserJSONRenderer,)
+    permission_classes = (IsAuthenticated,)
+    serializer_class = MeSerializer
+
+    def get_object(self):
+        """
+        retrive current user info
+        """
+        email = self.request.user.email
+        return User.objects.get(email=email)

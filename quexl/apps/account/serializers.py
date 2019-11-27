@@ -2,7 +2,7 @@ from django.contrib.auth import authenticate
 
 from rest_framework import serializers, validators
 from rest_framework.validators import UniqueValidator
-
+from django.contrib.auth.models import Permission, Group
 from quexl.apps.account.backends import JWTAuthentication
 from .models import User
 
@@ -179,3 +179,39 @@ class SocialAuthSerializer(serializers.Serializer):
     access_token_secret = serializers.CharField(
         max_length=4096, required=False, trim_whitespace=True
     )
+
+
+class PermissionsSerializer(serializers.ModelSerializer):
+    """
+    serialize user permissions
+    """
+
+    class Meta:
+        model = Permission
+        exclude = ("content_type",)
+
+
+class GroupSerializer(serializers.ModelSerializer):
+    """
+    serialize user groups
+    """
+
+    class Meta:
+        model = Group
+        exclude = ("permissions",)
+
+
+class MeSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        exclude = (
+            "password",
+            "is_active",
+            "is_superuser",
+            "is_staff",
+            "updated_at",
+        )
+
+    is_admin = serializers.BooleanField(source="is_superuser", read_only=True)
+    user_permissions = PermissionsSerializer(many=True)
+    groups = GroupSerializer(many=True)
