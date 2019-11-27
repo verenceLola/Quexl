@@ -1,4 +1,5 @@
-from django.urls import resolve, reverse
+from django.urls import resolve
+from django.urls import reverse
 
 import quexl.apps.account.views as views
 
@@ -14,7 +15,7 @@ def test_user_resource_url_resolves():
     """
     test user resource url resolves
     """
-    url = reverse("authentication:user", args=[1])
+    url = reverse("authentication:user-details", args=[1])
     assert resolve(url).func.view_class == views.UserResourceAPIView
 
 

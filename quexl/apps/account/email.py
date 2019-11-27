@@ -16,8 +16,8 @@ class Email:
         message = "Please verify your account "
         domain = get_current_site(request).domain
         token = JWTAuthentication.generate_token(user["username"])
-        protocol = request.META["SERVER_PROTOCOL"][:4]
-        activation_link = protocol + "://" + domain + "/api/auth/" + token
+        # protocol = request.META["SERVER_PROTOCOL"][:4]
+        activation_link = "http" + "://" + domain + "/api/auth/" + token
         body = render_to_string(
             "verify_account.html",
             {"link": activation_link, "name": user["username"]},

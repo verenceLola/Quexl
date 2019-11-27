@@ -8,6 +8,7 @@ from rest_framework.validators import ValidationError
 from rest_framework.views import exception_handler
 
 from quexl.helpers.api_response import APIResponse
+from rest_framework import exceptions
 
 view_map = {
     "profiles": lambda operation, response, **kwargs: APIResponse.get_error_response(
@@ -43,3 +44,11 @@ def custom_exception_handler(exc, context):
         )
 
     return response
+
+
+class NotGroupMember(exceptions.PermissionDenied):
+    """
+    user not authorized to access group
+    """
+
+    default_detail = "You're not a member of this group"

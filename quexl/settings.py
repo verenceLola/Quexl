@@ -37,10 +37,12 @@ INSTALLED_APPS = [
     # local apps
     "quexl.apps.account",
     "quexl.apps.profiles",
+    "quexl.apps.messaging",
     # external apps
     "phonenumber_field",
     "social_django",
     "djmoney",
+    "channels",
     "languages",
 ]
 
@@ -93,6 +95,16 @@ TEMPLATE_DEBUG = DEBUG
 SECRET_KEY = env.str("SECRET_KEY", "#gy%@@^ySGT@^")
 
 DATABASES = {"default": env.db()}
+
+# configure Django Channels
+REDIS = env.str("REDIS_HOST", "localhost")
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels_redis.core.RedisChannelLayer",
+        "CONFIG": {"hosts": [(REDIS, 6379)]},
+    }
+}
+ASGI_APPLICATION = "quexl.routing.application"
 
 # configure email
 
