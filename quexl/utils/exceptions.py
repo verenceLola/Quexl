@@ -11,7 +11,7 @@ from rest_framework import status
 view_map = {
     "profiles": lambda operation, response, **kwargs: get_error_response(
         "%s failed. Fix the error(s) below" % operation,
-        "User profile '%s' does not exist" % kwargs["profile_id"],
+        "Profile for username '%s' does not exist" % kwargs["username"],
         status_code=response.status_code,
     )
 }

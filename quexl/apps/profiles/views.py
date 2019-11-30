@@ -9,16 +9,11 @@ from quexl.apps.profiles.renderers import ProfileRenderer
 class ProfileGenericAPIView(RetrieveUpdateAPIView):
     permission_classes = (IsAuthenticated, IsOwnerOrReadOnly)
     serializer_class = ProfileSerializer
-    lookup_url_kwarg = "profile_id"
+    lookup_url_kwarg = "username"
     renderer_classes = (ProfileRenderer,)
+    lookup_field = "user__username"
     name = "profiles"
-
-    def get_queryset(self):
-        """
-        return custom queryset
-        """
-        profile_id = self.kwargs.get(self.lookup_url_kwarg)
-        return Profile.objects.filter(pk=profile_id)
+    queryset = Profile.objects.all()
 
     def update(self, request, **kwargs):
         """

@@ -9,7 +9,7 @@ class ProfileRenderer(JSONRenderer):
 
     def render(self, data, accepted_media_type=None, render_context=None):
         status_code = render_context["response"].status_code
-        profile_id = render_context["kwargs"]["profile_id"]
+        profile_id = render_context["kwargs"]["username"]
         operation = getattr(render_context["view"], "operation", None)
 
         def cleanErrorData(data: dict) -> dict:
@@ -29,7 +29,7 @@ class ProfileRenderer(JSONRenderer):
 
         data = (
             {
-                "message": "User Profile '%s'" % profile_id
+                "message": "User Profile for user '%s'" % profile_id
                 if render_context["request"].method == "GET"
                 else "%s successfull" % operation,
                 "data": data,
