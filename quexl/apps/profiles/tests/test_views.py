@@ -29,8 +29,8 @@ def test_view_user_profile(client, generate_access_token1):
     test that user profile has all the required fields
     """
     token, user = generate_access_token1
-    profile_id = user.profile.id
-    profile_url = reverse("profiles:user_profiles", args=[profile_id])
+    username = user.username
+    profile_url = reverse("profiles:user_profiles", args=[username])
     response = client.get(profile_url, HTTP_AUTHORIZATION="Bearer " + token)
     assert response.status_code == 200
     assert response.data["title"] == ""
@@ -65,8 +65,8 @@ def test_edit_profile_fields_correctly(
     test editing profile fields
     """
     token, user = generate_access_token1
-    profile_id = user.profile.id
-    profile_url = reverse("profiles:user_profiles", args=[profile_id])
+    username = user.username
+    profile_url = reverse("profiles:user_profiles", args=[username])
     response = client.patch(
         profile_url,
         field_value,
@@ -85,8 +85,8 @@ def test_edit_profile_address(client, generate_access_token1):
     test editing profile address
     """
     token, user = generate_access_token1
-    profile_id = user.profile.id
-    profile_url = reverse("profiles:user_profiles", args=[profile_id])
+    username = user.username
+    profile_url = reverse("profiles:user_profiles", args=[username])
     response = client.patch(
         profile_url,
         {"address": [address]},
@@ -102,8 +102,8 @@ def test_add_duplicate_profile_address(client, generate_access_token1):
     test adding duplicate profile addresses
     """
     token, user = generate_access_token1
-    profile_id = user.profile.id
-    profile_url = reverse("profiles:user_profiles", args=[profile_id])
+    username = user.username
+    profile_url = reverse("profiles:user_profiles", args=[username])
     response = client.patch(
         profile_url,
         {"address": [address, address]},
@@ -111,7 +111,7 @@ def test_add_duplicate_profile_address(client, generate_access_token1):
         content_type="application/json",
     )
     response.render()
-    assert Address.objects.filter(profile_id=profile_id).count() == 1
+    assert Address.objects.filter(profile_id=user.profile.id).count() == 1
     assert len(response.data["address"]) == 1
     assert b"Update user profile successfull" in response.content
 
@@ -121,8 +121,8 @@ def test_invalid_country_in_profile_address(client, generate_access_token1):
     test adding address with invalid country code
     """
     token, user = generate_access_token1
-    profile_id = user.profile.id
-    profile_url = reverse("profiles:user_profiles", args=[profile_id])
+    username = user.username
+    profile_url = reverse("profiles:user_profiles", args=[username])
     # update country value
     new_address = address.copy()
     new_address.update({"country": "invalid_country_code"})
@@ -146,8 +146,8 @@ def test_invalid_country_in_profile_address(client, generate_access_token1):
 )
 def test_invalid_address_fields(client, generate_access_token1, fieldName):
     token, user = generate_access_token1
-    profile_id = user.profile.id
-    profile_url = reverse("profiles:user_profiles", args=[profile_id])
+    username = user.username
+    profile_url = reverse("profiles:user_profiles", args=[username])
     # update fieldName value to invalid string
     new_address = address.copy()
     new_address[fieldName] = "7868strin"
@@ -182,8 +182,8 @@ def test_required_field_for_profile_address(
     test all required fields for profile address
     """
     token, user = generate_access_token1
-    profile_id = user.profile.id
-    profile_url = reverse("profiles:user_profiles", args=[profile_id])
+    username = user.username
+    profile_url = reverse("profiles:user_profiles", args=[username])
     new_address = address.copy()
     new_address.pop(fieldName)
     response = client.patch(
@@ -202,8 +202,8 @@ def test_create_work_experience(client, generate_access_token1):
     test creating work experience for user profile
     """
     token, user = generate_access_token1
-    profile_id = user.profile.id
-    profile_url = reverse("profiles:user_profiles", args=[profile_id])
+    username = user.username
+    profile_url = reverse("profiles:user_profiles", args=[username])
     response = client.patch(
         profile_url,
         {"work_experience": [work_experience]},
@@ -212,7 +212,9 @@ def test_create_work_experience(client, generate_access_token1):
     )
     assert response.status_code == 200
     assert b"Update user profile successfull" in response.content
-    assert WorkExperience.objects.filter(profile_id=profile_id).count() == 1
+    assert (
+        WorkExperience.objects.filter(profile_id=user.profile.id).count() == 1
+    )
 
 
 def test_add_duplicate_profile_work_experience(client, generate_access_token1):
@@ -220,8 +222,8 @@ def test_add_duplicate_profile_work_experience(client, generate_access_token1):
     test user cannot add duplicate work experience info
     """
     token, user = generate_access_token1
-    profile_id = user.profile.id
-    profile_url = reverse("profiles:user_profiles", args=[profile_id])
+    username = user.username
+    profile_url = reverse("profiles:user_profiles", args=[username])
     response = client.patch(
         profile_url,
         {"work_experience": [work_experience, work_experience]},
@@ -229,7 +231,9 @@ def test_add_duplicate_profile_work_experience(client, generate_access_token1):
         content_type="application/json",
     )
     assert response.status_code == 200
-    assert WorkExperience.objects.filter(profile_id=profile_id).count() == 1
+    assert (
+        WorkExperience.objects.filter(profile_id=user.profile.id).count() == 1
+    )
     assert b"Update user profile successfull" in response.content
     assert len(response.data["work_experience"]) == 1
 
@@ -239,8 +243,8 @@ def test_work_experience_start_data(client, generate_access_token1):
     test setting work experience to future date
     """
     token, user = generate_access_token1
-    profile_id = user.profile.id
-    profile_url = reverse("profiles:user_profiles", args=[profile_id])
+    username = user.username
+    profile_url = reverse("profiles:user_profiles", args=[username])
     new_work_experience = work_experience.copy()
     new_work_experience.update({"start_date": now() + timedelta(hours=3)})
     response = client.patch(
@@ -258,8 +262,8 @@ def test_work_experience_end_date(client, generate_access_token1):
     test end date for work experience is valid
     """
     token, user = generate_access_token1
-    profile_id = user.profile.id
-    profile_url = reverse("profiles:user_profiles", args=[profile_id])
+    username = user.username
+    profile_url = reverse("profiles:user_profiles", args=[username])
     new_work_experience = work_experience.copy()
     new_work_experience.update({"end_date": "2018-10-25 22:58:55.216869+03"})
     response = client.patch(
@@ -293,8 +297,8 @@ def test_required_work_experience_fields(
     test required work experience fields
     """
     token, user = generate_access_token1
-    profile_id = user.profile.id
-    profile_url = reverse("profiles:user_profiles", args=[profile_id])
+    username = user.username
+    profile_url = reverse("profiles:user_profiles", args=[username])
     new_work_experience = work_experience.copy()
     new_work_experience.pop(fieldName)
     response = client.patch(
@@ -313,8 +317,8 @@ def test_edit_profile_education_details(client, generate_access_token1):
     test edit education details for a given profile id
     """
     token, user = generate_access_token1
-    profile_id = user.profile.id
-    profile_url = reverse("profiles:user_profiles", args=[profile_id])
+    username = user.username
+    profile_url = reverse("profiles:user_profiles", args=[username])
     response = client.patch(
         profile_url,
         {"education": [education]},
@@ -322,7 +326,7 @@ def test_edit_profile_education_details(client, generate_access_token1):
         content_type="application/json",
     )
     assert response.status_code == 200
-    assert Education.objects.filter(profile_id=profile_id).count() == 1
+    assert Education.objects.filter(profile_id=user.profile.id).count() == 1
     assert len(response.data["education"]) == 1
     assert b"Update user profile successfull" in response.content
 
@@ -332,8 +336,8 @@ def test_invalid_education_country(client, generate_access_token1):
     test updating education with invalid country code
     """
     token, user = generate_access_token1
-    profile_id = user.profile.id
-    profile_url = reverse("profiles:user_profiles", args=[profile_id])
+    username = user.username
+    profile_url = reverse("profiles:user_profiles", args=[username])
     new_education = education.copy()
     new_education.update({"country": "invalid_country"})
     response = client.patch(
@@ -351,8 +355,8 @@ def test_duplicate_education_info(client, generate_access_token1):
     test duplicate education info
     """
     token, user = generate_access_token1
-    profile_id = user.profile.id
-    profile_url = reverse("profiles:user_profiles", args=[profile_id])
+    username = user.username
+    profile_url = reverse("profiles:user_profiles", args=[username])
     response = client.patch(
         profile_url,
         {"education": [education, education]},
@@ -360,7 +364,7 @@ def test_duplicate_education_info(client, generate_access_token1):
         content_type="application/json",
     )
     assert response.status_code == 200
-    assert Education.objects.filter(profile_id=profile_id).count() == 1
+    assert Education.objects.filter(profile_id=user.profile.id).count() == 1
     assert len(response.data["education"]) == 1
     assert b"Update user profile successfull" in response.content
 
@@ -384,8 +388,8 @@ def test_missing_fields_for_education(
     test missing/ required fields for profile education
     """
     token, user = generate_access_token1
-    profile_id = user.profile.id
-    profile_url = reverse("profiles:user_profiles", args=[profile_id])
+    username = user.username
+    profile_url = reverse("profiles:user_profiles", args=[username])
     new_education = education.copy()
     new_education.pop(fieldName)
     response = client.patch(
@@ -413,8 +417,8 @@ def test_on_going_and_end_date_for_education(
     ensure at least on_going or end_date fields are provided
     """
     token, user = generate_access_token1
-    profile_id = user.profile.id
-    profile_url = reverse("profiles:user_profiles", args=[profile_id])
+    username = user.username
+    profile_url = reverse("profiles:user_profiles", args=[username])
     new_education = education.copy()
     new_education["end_date"] = end_date
     response = client.patch(
@@ -432,8 +436,8 @@ def test_edit_profile_skill_info(client, generate_access_token1):
     test create profile skills info
     """
     token, user = generate_access_token1
-    profile_id = user.profile.id
-    profile_url = reverse("profiles:user_profiles", args=[profile_id])
+    username = user.username
+    profile_url = reverse("profiles:user_profiles", args=[username])
     response = client.patch(
         profile_url,
         {"skills": [skill]},
@@ -441,7 +445,7 @@ def test_edit_profile_skill_info(client, generate_access_token1):
         content_type="application/json",
     )
     assert response.status_code == 200
-    assert Skill.objects.filter(profile_id=profile_id).count() == 1
+    assert Skill.objects.filter(profile_id=user.profile.id).count() == 1
     assert len(response.data["skills"]) == 1
     assert b"Update user profile successfull" in response.rendered_content
 
@@ -451,8 +455,8 @@ def test_duplicate_skills(client, generate_access_token1):
     test duplicate skill info for a given profile
     """
     token, user = generate_access_token1
-    profile_id = user.profile.id
-    profile_url = reverse("profiles:user_profiles", args=[profile_id])
+    username = user.username
+    profile_url = reverse("profiles:user_profiles", args=[username])
     response = client.patch(
         profile_url,
         {"skills": [skill, skill]},
@@ -460,7 +464,7 @@ def test_duplicate_skills(client, generate_access_token1):
         content_type="application/json",
     )
     assert response.status_code == 200
-    assert Skill.objects.filter(profile_id=profile_id).count() == 1
+    assert Skill.objects.filter(profile_id=user.profile.id).count() == 1
     assert len(response.data["skills"]) == 1
     assert b"Update user profile successfull" in response.rendered_content
 
@@ -470,8 +474,8 @@ def test_invalid_skill_expertise_value(client, generate_access_token1):
     test invalid skill expertice value
     """
     token, user = generate_access_token1
-    profile_id = user.profile.id
-    profile_url = reverse("profiles:user_profiles", args=[profile_id])
+    username = user.username
+    profile_url = reverse("profiles:user_profiles", args=[username])
     new_skill = skill.copy()
     new_skill.update({"expertise": "invalid_value"})
     response = client.patch(
@@ -493,8 +497,8 @@ def test_skill_expertice_choices(client, generate_access_token1, choice):
     test all skill expertice choices
     """
     token, user = generate_access_token1
-    profile_id = user.profile.id
-    profile_url = reverse("profiles:user_profiles", args=[profile_id])
+    username = user.username
+    profile_url = reverse("profiles:user_profiles", args=[username])
     new_skill = skill.copy()
     new_skill["expertise"] = choice
     response = client.patch(
@@ -516,8 +520,8 @@ def test_education_level_choices(client, generate_access_token1, choice):
     test all education level choices
     """
     token, user = generate_access_token1
-    profile_id = user.profile.id
-    profile_url = reverse("profiles:user_profiles", args=[profile_id])
+    username = user.username
+    profile_url = reverse("profiles:user_profiles", args=[username])
     new_education = education.copy()
     new_education["level"] = choice
     response = client.patch(
@@ -536,8 +540,8 @@ def test_required_skills_fields(client, generate_access_token1, fieldName):
     test required fields for skills info
     """
     token, user = generate_access_token1
-    profile_id = user.profile.id
-    profile_url = reverse("profiles:user_profiles", args=[profile_id])
+    username = user.username
+    profile_url = reverse("profiles:user_profiles", args=[username])
     new_skill = skill.copy()
     new_skill.pop(fieldName)
     response = client.patch(
@@ -556,8 +560,8 @@ def test_education_level_invalid_choice(client, generate_access_token1):
     test invalid education level value
     """
     token, user = generate_access_token1
-    profile_id = user.profile.id
-    profile_url = reverse("profiles:user_profiles", args=[profile_id])
+    username = user.username
+    profile_url = reverse("profiles:user_profiles", args=[username])
     new_education = education.copy()
     new_education.update({"level": "invalid_value"})
     response = client.patch(
@@ -579,8 +583,8 @@ def test_required_profile_language_fields(
     test update profile languages info
     """
     token, user = generate_access_token1
-    profile_id = user.profile.id
-    profile_url = reverse("profiles:user_profiles", args=[profile_id])
+    username = user.username
+    profile_url = reverse("profiles:user_profiles", args=[username])
     language = {"name": "sw", "fluency": "limited"}
     language.pop(fieldName)
     response = client.patch(
