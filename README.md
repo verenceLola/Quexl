@@ -5,7 +5,7 @@
 ![Build Status](https://github.com/verenceLola/Quexl/workflows/Django%20application/badge.svg)
 [![codecov](https://codecov.io/gh/verenceLola/Quexl/branch/develop/graph/badge.svg?token=zNEszwcQ4u)](https://codecov.io/gh/verenceLola/Quexl)
 
-This is a Feverr-Like Django backend
+This is an online marketplace for freelance services.
 
 [![Run in Postman](https://run.pstmn.io/button.svg)](https://app.getpostman.com/run-collection/2acad8ef40948488fbab#?env%5BQuexl%5D=W3sia2V5IjoiYmFzZV91cmwiLCJ2YWx1ZSI6IiIsImVuYWJsZWQiOnRydWV9LHsia2V5IjoidG9rZW4iLCJ2YWx1ZSI6IiIsImVuYWJsZWQiOnRydWV9XQ==)
 

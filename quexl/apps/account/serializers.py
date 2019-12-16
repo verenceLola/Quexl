@@ -210,8 +210,9 @@ class MeSerializer(serializers.ModelSerializer):
             "is_superuser",
             "is_staff",
             "updated_at",
+            "groups",
         )
 
     is_admin = serializers.BooleanField(source="is_superuser", read_only=True)
     user_permissions = PermissionsSerializer(many=True)
-    groups = GroupSerializer(many=True)
+    roles = GroupSerializer(many=True, source="groups")

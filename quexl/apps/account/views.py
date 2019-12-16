@@ -126,7 +126,10 @@ class LoginAPIView(GenericAPIView):
         user.last_login = now()
         user.save()
         return Response(
-            {"message": "You have successfully logged in", "token": token},
+            {
+                "message": "You have successfully logged in",
+                "meta": {"token": token},
+            },
             status=status.HTTP_200_OK,
         )
 
