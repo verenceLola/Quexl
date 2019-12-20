@@ -1,4 +1,3 @@
-from djmoney.models.fields import MoneyField
 from django.contrib.auth.models import (
     AbstractBaseUser,
     BaseUserManager,
@@ -7,6 +6,8 @@ from django.contrib.auth.models import (
 from django.db import models
 from django.db.models import Q
 from django.utils.translation import pgettext_lazy
+from djmoney.models.fields import MoneyField
+
 from quexl.helpers.fancy_generator import fancy_id_generator
 
 
@@ -25,11 +26,11 @@ class UserManager(BaseUserManager):
             raise TypeError("Users must have an email address.")
 
         email = self.normalize_email(email)
-
         user = self.model(username=username, email=email, **extra_fields)
 
         if password:
             user.set_password(password)
+
         user.save()
 
         return user

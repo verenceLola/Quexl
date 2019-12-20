@@ -1,37 +1,32 @@
 from django.urls import path
 
-from .views import (
-    RegistrationAPIView,
-    LoginAPIView,
-    UserActivationAPIView,
-    UserResourceAPIView,
-    ForgotPasswordView,
-    ResetPasswordView,
-    SocialAuthView,
-    AuthMeRetriveAPIView,
-)
+import quexl.apps.account.views as views
 
 app_name = "authentication"
 
 urlpatterns = [
-    path("auth/register", RegistrationAPIView.as_view(), name="user_signup"),
-    path("auth/login", LoginAPIView.as_view(), name="user_login"),
-    path("auth/me", AuthMeRetriveAPIView.as_view(), name="me"),
+    path("auth/register", views.SignUpAPIView.as_view(), name="user_signup"),
+    path("auth/login", views.LoginAPIView.as_view(), name="user_login"),
+    path("auth/me", views.CurrentUserRetriveAPIView.as_view(), name="me"),
     path(
         "auth/<str:token>",
-        UserActivationAPIView.as_view(),
+        views.UserActivationAPIView.as_view(),
         name="activate_user",
     ),
     path(
         "users/forgot_password",
-        ForgotPasswordView.as_view(),
+        views.ForgotPasswordView.as_view(),
         name="forgot_password",
     ),
     path(
         "auth/reset_password/<str:token>",
-        ResetPasswordView.as_view(),
+        views.ResetPasswordView.as_view(),
         name="reset_password",
     ),
-    path("social-auth/login", SocialAuthView.as_view(), name="social_auth"),
-    path("user/<str:user_id>", UserResourceAPIView.as_view(), name="user"),
+    path(
+        "social-auth/login", views.SocialAuthView.as_view(), name="social_auth"
+    ),
+    path(
+        "user/<str:user_id>", views.UserResourceAPIView.as_view(), name="user"
+    ),
 ]

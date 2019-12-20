@@ -1,7 +1,7 @@
 import json
 
-from rest_framework.renderers import JSONRenderer
 from rest_framework import status
+from rest_framework.renderers import JSONRenderer
 
 
 class UserJSONRenderer(JSONRenderer):
@@ -17,6 +17,7 @@ class UserJSONRenderer(JSONRenderer):
         # the default JSONRenderer to handle rendering errors, so we need to
         # check for this case.
         status_code = renderer_context["response"].status_code
+
         return (
             json.dumps(data)
             if status.is_success(status_code)

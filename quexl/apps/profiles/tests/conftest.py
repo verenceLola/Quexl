@@ -1,14 +1,13 @@
 """
 fixtures for profiles fields
 """
-from quexl.apps.profiles.models import (
-    Education,
-    Skill,
-    Address,
-    WorkExperience,
-    Language,
-)
 import pytest
+
+from quexl.apps.profiles.models import Address
+from quexl.apps.profiles.models import Education
+from quexl.apps.profiles.models import Language
+from quexl.apps.profiles.models import Skill
+from quexl.apps.profiles.models import WorkExperience
 
 
 @pytest.fixture()
@@ -28,6 +27,7 @@ def create_education(create_db_user):
     }
     profile = create_db_user.profile
     educ = Education.objects.create(profile=profile, **education_details)
+
     return educ
 
 
@@ -39,6 +39,7 @@ def create_skill(create_db_user):
     profile = create_db_user.profile
     skill_details = {"name": "first", "expertise": "beginner"}
     skill = Skill.objects.create(profile=profile, **skill_details)
+
     return skill
 
 
@@ -58,6 +59,7 @@ def create_adress(create_db_user):
         "phone": "+254713077520",
     }
     address = Address.objects.create(profile=profile, **address_details)
+
     return address
 
 
@@ -77,6 +79,7 @@ def create_workexperience(create_db_user):
         "description": "Should be optional",
     }
     work = WorkExperience.objects.create(profile=profile, **work_details)
+
     return work
 
 
@@ -87,4 +90,5 @@ def create_language(create_db_user):
     """
     profile = create_db_user.profile
     language_details = {"name": "sw", "fluency": "limited"}
+
     return Language.objects.create(profile=profile, **language_details)

@@ -1,9 +1,10 @@
 from rest_framework.generics import RetrieveUpdateAPIView
 from rest_framework.permissions import IsAuthenticated
-from quexl.apps.profiles.permissions import IsOwnerOrReadOnly
-from quexl.apps.profiles.serializers import ProfileSerializer
+
 from quexl.apps.profiles.models import Profile
+from quexl.apps.profiles.permissions import IsOwnerOrReadOnly
 from quexl.apps.profiles.renderers import ProfileRenderer
+from quexl.apps.profiles.serializers import ProfileSerializer
 
 
 class ProfileGenericAPIView(RetrieveUpdateAPIView):
@@ -20,6 +21,7 @@ class ProfileGenericAPIView(RetrieveUpdateAPIView):
         override updating user profile
         """
         self.operation = "Update user profile"
+
         return super(RetrieveUpdateAPIView, self).update(request, **kwargs)
 
     def get(self, request, **kwargs):
@@ -27,4 +29,5 @@ class ProfileGenericAPIView(RetrieveUpdateAPIView):
         view user profile
         """
         self.operation = "View user profile"
+
         return super(RetrieveUpdateAPIView, self).retrieve(request, **kwargs)

@@ -1,7 +1,9 @@
+import pytest
+
 from quexl.apps.account.models import User
 from quexl.apps.profiles.models import Address
-import pytest
-from .fixtures import user_details_without_email, user_details_without_username
+
+from .fixtures import signup as fixtures
 
 
 @pytest.mark.django_db
@@ -55,11 +57,11 @@ def test_get_user_by_wrong_id(create_db_user):
     "user_details, expected_output",
     [
         (
-            user_details_without_username,
+            fixtures.user_details_without_username,
             "Users must have a username.",
         ),  # missing username
         (
-            user_details_without_email,
+            fixtures.user_details_without_email,
             "Users must have an email address.",
         ),  # missing email
     ],
@@ -91,6 +93,7 @@ def test_create_super_user(db):
     assert super_user.is_superuser
     # test create super user without password
     super_user_details["password"] = None
+
     with pytest.raises(TypeError, match="Superusers must have a password."):
         User.objects.create_superuser(**super_user_details)
 

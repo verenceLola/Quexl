@@ -13,10 +13,12 @@ class RolesSerializer(serializers.Serializer):
         """
         get role name
         """
+
         return obj.get_name()
 
     def get_description(self, obj):
         """
         get role description
         """
+
         return obj.get_description()
