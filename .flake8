@@ -7,5 +7,6 @@ exclude =
     old,
     build,
     dist,
-    venv
+    venv,
+    __init__.py
 max-line-length=90

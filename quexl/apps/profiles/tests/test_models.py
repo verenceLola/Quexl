@@ -1,11 +1,15 @@
 """
 test profiles models
 """
-from quexl.apps.profiles.models import Profile, Language, Skill
-from freezegun import freeze_time
 from datetime import datetime
+
 import pytest
 from django.db import IntegrityError
+from freezegun import freeze_time
+
+from quexl.apps.profiles.models import Language
+from quexl.apps.profiles.models import Profile
+from quexl.apps.profiles.models import Skill
 
 
 def test_new_profile_has_expected_fields(create_db_user):
@@ -50,6 +54,7 @@ def test_update_profile_with_duplicate_language(create_language):
     """
     profile = create_language.profile
     dup_language = {"name": "sw"}
+
     with pytest.raises(IntegrityError):
         Language.objects.create(profile=profile, **dup_language)
 
@@ -60,5 +65,6 @@ def test_update_skill_with_duplicate_address(create_skill):
     """
     profile = create_skill.profile
     dup_skill = {"name": "first"}
+
     with pytest.raises(IntegrityError):
         Skill.objects.create(profile=profile, **dup_skill)

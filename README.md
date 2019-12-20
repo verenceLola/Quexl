@@ -1,9 +1,11 @@
 # Quexl
 
+[![Maintainability](https://api.codeclimate.com/v1/badges/2773f09c29c11f82579a/maintainability)](https://codeclimate.com/github/verenceLola/Quexl/maintainability)
 [![Build Status](https://travis-ci.com/verenceLola/Quexl.svg?token=A77sHzTptZ8EutExRXpa&branch=develop)](https://travis-ci.com/verenceLola/Quexl)
 [![Build Status](https://verencelola.visualstudio.com/Quexl/_apis/build/status/verenceLola.Quexl?branchName=develop)](https://verencelola.visualstudio.com/Quexl/_build/latest?definitionId=12&branchName=develop)
 ![Build Status](https://github.com/verenceLola/Quexl/workflows/Django%20application/badge.svg)
 [![codecov](https://codecov.io/gh/verenceLola/Quexl/branch/develop/graph/badge.svg?token=zNEszwcQ4u)](https://codecov.io/gh/verenceLola/Quexl)
+[![Test Coverage](https://api.codeclimate.com/v1/badges/2773f09c29c11f82579a/test_coverage)](https://codeclimate.com/github/verenceLola/Quexl/test_coverage)
 
 This is an online marketplace for freelance services.
 
@@ -21,7 +23,7 @@ The Application has been documented using Postman Documentation tht can be viewe
     DATABASE_URL=postgres://<user>:<password>@<host>:<port>/<database name> #  postgres://postgres@127.0.0.1:5432 if no username or password configured, or just a remote host's URL
     ```
 
-### Setup VirtulEnvironment
+### Setup VirtualEnvironment
 
 - Setup Pyhton virtual environment by running `python3 -m venv venv`
 

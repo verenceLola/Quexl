@@ -1,11 +1,13 @@
 """
 test authentication backends
 """
-from quexl.apps.account.backends import JWTAuthentication
-import pytest
-import freezegun
 import datetime
+
+import freezegun
+import pytest
 from rest_framework.exceptions import AuthenticationFailed
+
+from quexl.apps.account.backends import JWTAuthentication
 
 
 @pytest.fixture
@@ -16,6 +18,7 @@ def setup_jwt():
 @freezegun.freeze_time("2019-08-10")
 def generate_expired_token():
     user_data = {"username": "username1", "email": "email@quexl.com"}
+
     return JWTAuthentication().generate_token(user_data)
 
 
@@ -94,6 +97,7 @@ def test_authenticate_credentials_with_invalid_token(
     test authenticate user credentials with invalid token
     """
     jwt = setup_jwt
+
     with pytest.raises(AuthenticationFailed, match=expected_message):
         jwt.authenticate_credentials(token)
 
@@ -109,5 +113,6 @@ def test_authenticate_credentials_for_inactive_user(
     user.is_active = False  # deactivate user account
     user.save()
     jwt = setup_jwt
+
     with pytest.raises(AuthenticationFailed, match="User inactive or deleted"):
         jwt.authenticate_credentials(token)

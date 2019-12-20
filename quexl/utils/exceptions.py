@@ -1,15 +1,16 @@
 """
 custom exception handler for views
 """
-from rest_framework.views import exception_handler
-from quexl.helpers.endpoint_response import get_error_response
 from django.http import Http404
-from rest_framework.validators import ValidationError
-from rest_framework.response import Response
 from rest_framework import status
+from rest_framework.response import Response
+from rest_framework.validators import ValidationError
+from rest_framework.views import exception_handler
+
+from quexl.helpers.api_response import APIResponse
 
 view_map = {
-    "profiles": lambda operation, response, **kwargs: get_error_response(
+    "profiles": lambda operation, response, **kwargs: APIResponse.get_error_response(
         "%s failed. Fix the error(s) below" % operation,
         "Profile for username '%s' does not exist" % kwargs["username"],
         status_code=response.status_code,
@@ -32,6 +33,7 @@ def custom_exception_handler(exc, context):
         operation = context[
             "view"
         ].operation  # every view method should have an operation
+
         return Response(
             {
                 "message": "%s failed. Fix the error(s) below" % operation,
@@ -39,4 +41,5 @@ def custom_exception_handler(exc, context):
             },
             status=status.HTTP_422_UNPROCESSABLE_ENTITY,
         )
+
     return response

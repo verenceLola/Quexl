@@ -1,5 +1,6 @@
 from random import random
 from time import time
+
 import numpy
 
 
@@ -26,16 +27,7 @@ class PushID(object):
     )
 
     def __init__(self):
-
-        # Timestamp of last push, used to prevent local collisions if you
-        # pushtwice in one ms.
         self.last_push_time = 0
-
-        # We generate 72-bits of randomness which get turned into 12
-        # characters and appended to the timestamp to prevent
-        # collisions with other clients.  We store the last characters
-        # we generated because in the event of a collision, we'll use
-        # those same characters except "incremented" by one.
         self.last_rand_chars = numpy.empty(12, dtype=int)
 
     def next_id(self):
@@ -74,6 +66,7 @@ class PushID(object):
             now = int(now / 64)
 
         unique_id = "".join(time_stamp_chars)
+
         return unique_id
 
     def set_last_rand_char(self, duplicate_time):
@@ -84,12 +77,8 @@ class PushID(object):
         """
         if not duplicate_time:
             for i in range(12):
-                # random() returns a floating point number in the
-                # range(0.0, 1.0)
                 self.last_rand_chars[i] = int(random() * 64)
         else:
-            # If the timestamp hasn't changed since last push, use the
-            # same random number, except incremented by 1.
             self.get_previous_rand_char()
 
     def get_previous_rand_char(self):
