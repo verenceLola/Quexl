@@ -2,11 +2,14 @@
 utility functions for websocket connections
 """
 from channels.db import database_sync_to_async
-from quexl.apps.messaging.models import Thread, Message
 from channels.generic.websocket import AsyncJsonWebsocketConsumer
-from .md5 import md5
-from quexl.apps.account.models import User
 from django.db.models import Q
+
+from quexl.apps.account.models import User
+from quexl.apps.messaging.models import Message
+from quexl.apps.messaging.models import Thread
+
+from .md5 import md5
 
 
 @database_sync_to_async
