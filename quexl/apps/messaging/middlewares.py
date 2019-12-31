@@ -19,7 +19,6 @@ class JWTAuthMiddleware:
     def __call__(self, scope):
         headers = dict(scope["headers"])
         query_string = scope["query_string"]
-
         if b"token" in query_string:
             parsed_query_string = parse_qs(query_string)
             headers.update(
@@ -40,10 +39,12 @@ class JWTAuthMiddleware:
             except AuthenticationFailed as e:
                 scope["user"] = AnonymousUser()
                 scope["error"] = e.__str__()
+            except ValueError:
+                scope["user"] = AnonymousUser()
+                scope["error"] = "Invalid token"
         else:
             scope["user"] = AnonymousUser()
             scope["error"] = "Authentication credentials not provided"
-
         return self.inner(scope)
 
 

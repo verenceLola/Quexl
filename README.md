@@ -6,6 +6,7 @@
 ![Build Status](https://github.com/verenceLola/Quexl/workflows/Django%20application/badge.svg)
 [![codecov](https://codecov.io/gh/verenceLola/Quexl/branch/develop/graph/badge.svg?token=zNEszwcQ4u)](https://codecov.io/gh/verenceLola/Quexl)
 [![Test Coverage](https://api.codeclimate.com/v1/badges/2773f09c29c11f82579a/test_coverage)](https://codeclimate.com/github/verenceLola/Quexl/test_coverage)
+[![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 
 This is an online marketplace for freelance services.
 
@@ -54,6 +55,15 @@ The Application has been documented using Postman Documentation tht can be viewe
 ### Running Tests
 
 - To run unit test, [pytest](https://docs.pytest.org/en/latest/) is used. Run `pytest` at the root of the project
+
+
+### Contributing
+
+- Before contributing, ensure to install `pre-commit` by running  in the root of the application after application setup.
+    ``` bash
+    $ pre-commit init
+    ```
+    This is to enforce coding styles.
 
 ## Deployments and Releases
 

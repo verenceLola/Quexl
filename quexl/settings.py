@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/2.2/ref/settings/
 """
 
 import os
+
 import environ
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
@@ -116,8 +117,8 @@ EMAIL_HOST_PASSWORD = env.str("EMAIL_HOST_PASSWORD", "")
 
 AUTH_USER_MODEL = "account.User"
 SOCIAL_AUTH_POSTGRES_JSONFIELD = (
-    True
-)  # Use PostgreSQL JSONB to store extra_data  # noqa E501
+    True  # Use PostgreSQL JSONB to store extra_data  # noqa E501
+)
 AUTHENTICATION_BACKENDS = (
     "social_core.backends.facebook.FacebookOAuth2",
     "social_core.backends.google.GoogleOAuth2",
