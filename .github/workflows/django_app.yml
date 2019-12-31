@@ -18,6 +18,10 @@ jobs:
       with:
         postgresql user:
           'postgres'
+    - name: Setup Redis 5
+      uses: shogo82148/actions-setup-redis@v1
+      with:
+        redis-version: '5.x'
     - name: Install dependencies
       run: |
         # install libv to prevent psycopg2 build errors

@@ -4,6 +4,10 @@ resources:
       image: verencelola/custom_ubuntu
     - container: postgres
       image: postgres
+    - container: redis
+      image: redis
+      ports:
+      - 6379
 
 pool:
   vmImage: 'ubuntu-latest'
@@ -11,6 +15,7 @@ pool:
 container: 'Django_Container'
 services:
   postgres: postgres
+  redis: redis
 
 steps:
 
@@ -28,6 +33,7 @@ steps:
     env:
       DATABASE_URL: $(DATABASE_URL)
       DEBUG: $(DEBUG)
+      REDIS_PORT: $(AGENT_SERVICES_REDIS_PORTS_6379)
     displayName: 'Test with pytest'
 
   - task: PublishTestResults@2
