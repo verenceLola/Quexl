@@ -4,8 +4,14 @@ utility function for generating md5 hash
 import hashlib
 
 
-def md5(message: str) -> str:
+class MD5:
     """
-    digest message using md5
+    calculate md5 for a given object
     """
-    return hashlib.md5(message.encode()).hexdigest()
+
+    @staticmethod
+    def __call__(message: str) -> str:
+        """
+        digest message using md5
+        """
+        return hashlib.md5(message.encode()).hexdigest()

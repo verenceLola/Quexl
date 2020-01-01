@@ -1,17 +1,16 @@
 import json
 
-from channels.db import database_sync_to_async
 from channels.generic.websocket import AsyncJsonWebsocketConsumer
 from django.core.serializers.json import DjangoJSONEncoder
 
-from quexl.apps.messaging.models import Thread
+from quexl.utils.websocket import Authenticate
+from quexl.utils.websocket import IsGroupMember
+from quexl.utils.websocket import SaveMessage
 from quexl.utils.websocket import VerifyJSON
-from quexl.utils.websocket import WebSocketAuthenticate
-from quexl.utils.websockets import save_message_to_db
 
 
 class GroupChatConsumer(AsyncJsonWebsocketConsumer):
-    @WebSocketAuthenticate()
+    @Authenticate()
     async def connect(self):
         """
         establish websocket connection
@@ -27,36 +26,14 @@ class GroupChatConsumer(AsyncJsonWebsocketConsumer):
         )
 
     @VerifyJSON()
+    @IsGroupMember()
     async def receive(self, json_data):
         """
         process recieved text
         """
-        self.thread_name = json_data.get("group")
         message = json_data.get("message")
-        self.group_name = f"{self.thread_name}"
-        try:
-            self.thread = await database_sync_to_async(Thread.objects.get)(
-                name=self.group_name
-            )
-            if not Thread.objects.filter(
-                participants__in=[self.scope["user"]]
-            ).exists():
-                await self.send_json(
-                    {
-                        "error": f"Message not sent. You're not a member of this group"
-                    }
-                )
-                return
-        except Thread.DoesNotExist:
-            await self.send_json(
-                {
-                    "error": f"Message not sent. Group named"
-                    " '{self.group_name}' doesn't exist"
-                }
-            )
-            return
         await self.channel_layer.group_add(self.group_name, self.channel_name)
-        msg = await save_message_to_db(self, message)
+        msg = await SaveMessage()(self, message)
         await self.channel_layer.group_send(
             self.group_name,
             {

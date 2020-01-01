@@ -1,7 +1,7 @@
 from functools import wraps
 
 
-class WebSocketAuthenticate:
+class Authenticate:
     @staticmethod
     def __call__(func, **kwargs):
         @wraps(func)

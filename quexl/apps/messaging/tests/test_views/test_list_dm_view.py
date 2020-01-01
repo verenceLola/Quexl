@@ -23,7 +23,7 @@ async def test_list_dm_message(
     generate_access_token1,
     generate_access_token2,
     generate_new_token,
-    websocket_send_dm_message,
+    websocket_send_message,
 ):
     """
     test list dm messages
@@ -32,8 +32,11 @@ async def test_list_dm_message(
     token2, user2 = generate_access_token2
     token3, _ = generate_new_token(username="user3", password="user3456")
     url = reverse("messaging:user-dm-messages")
-    await websocket_send_dm_message(
-        token=token, to=user2.username, message="hello user2"
+    await websocket_send_message(
+        token=token,
+        to=user2.username,
+        message="hello user2",
+        endpoint="/chat/dm/",
     )
     response = client.get(url, HTTP_AUTHORIZATION=f"Bearer {token}")
     assert response.status_code == 200
