@@ -3,7 +3,6 @@ from rest_framework import serializers
 from quexl.apps.messaging.models import Thread
 
 from .message_serializer import MessageSerializer
-from .participant_serializer import ParticipantSerializer
 
 
 class DMMessagesSerializer(serializers.ModelSerializer):
@@ -13,7 +12,6 @@ class DMMessagesSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Thread
-        exclude = ("name", "type")
+        exclude = ("name", "participants", "type")
 
-    participants = ParticipantSerializer(many=True)
     messages = MessageSerializer(many=True, source="message_set")

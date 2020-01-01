@@ -5,7 +5,7 @@ class DMMessageFixtures:
 
     msg_response1 = {
         "message": {
-            "chatId": 1,
+            "chatId": 6,
             "text": "hello user2!",
             "sent_at": "2019-10-01T00:00:00Z",
             "sender": {"username": "user1", "email": "user1@quexl.com"},
@@ -13,9 +13,22 @@ class DMMessageFixtures:
     }
     msg_response2 = {
         "message": {
-            "chatId": 1,
+            "chatId": 6,
             "text": "I'm fine user1",
             "sent_at": "2019-10-01T00:00:00Z",
             "sender": {"username": "user2", "email": "user2@quexl.com"},
         }
+    }
+
+
+class GroupMessageFixtures:
+    """
+    websocket responses for group messaging
+    """
+
+    non_member_response = {
+        "error": "Message not sent. You're not a member of this group"
+    }
+    non_exisiting_group_response = {
+        "error": "Message not sent. Group named 'non-existing-group' doesn't exist"
     }

@@ -1,3 +1,5 @@
 [run]
 omit = */tests/*
         */migrations/*
+        quexl/apps/messaging/serializers/participant_serializer.py
+        quexl/apps/messaging/serializers/group_serializer.py

@@ -3,15 +3,15 @@ import json
 from channels.generic.websocket import AsyncJsonWebsocketConsumer
 from django.core.serializers.json import DjangoJSONEncoder
 
+from quexl.utils.websocket import Authenticate
+from quexl.utils.websocket import CreateThread
+from quexl.utils.websocket import SaveMessage
 from quexl.utils.websocket import VerifyJSON
-from quexl.utils.websocket import WebSocketAuthenticate
 from quexl.utils.websocket import WebSocketUserExists
-from quexl.utils.websockets import get_or_create_thread
-from quexl.utils.websockets import save_message_to_db
 
 
 class DMChatConsumer(AsyncJsonWebsocketConsumer):
-    @WebSocketAuthenticate()
+    @Authenticate()
     async def connect(self):
         """
         establish websocket connection
@@ -33,12 +33,12 @@ class DMChatConsumer(AsyncJsonWebsocketConsumer):
         process recieved text
         """
         message = json_data.get("message")
-        self.thread = await get_or_create_thread(
+        self.thread = await CreateThread()(
             self, self.to, "dm", [self.to, self.scope["user"]]
         )
         self.group_name = self.thread_name
         await self.channel_layer.group_add(self.group_name, self.channel_name)
-        msg = await save_message_to_db(self, message)
+        msg = await SaveMessage()(self, message)
 
         await self.channel_layer.group_send(
             self.group_name,

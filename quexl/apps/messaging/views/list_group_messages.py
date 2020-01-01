@@ -3,6 +3,7 @@ from rest_framework.generics import ListAPIView
 from rest_framework.permissions import IsAuthenticated
 
 from quexl.apps.messaging.models import Thread
+from quexl.utils.renderers import DefaultRenderer
 
 from ..serializers import GroupMessagesSerializer
 
@@ -14,6 +15,8 @@ class ListGroupMessages(ListAPIView):
 
     serializer_class = GroupMessagesSerializer
     permission_classes = (IsAuthenticated,)
+    renderer_classes = (DefaultRenderer,)
+    pluralized_name = "group messages"
 
     def get_queryset(self):
         """

@@ -95,7 +95,7 @@ def generate_new_token(django_user_model):
         username = kwargs.get("username")
         details = {
             "username": username,
-            "password": kwargs.get("password"),
+            "password": kwargs.get("password", "pass1234"),
             "email": f"{username}@quexl.com",
         }
         user = django_user_model.objects.create(**details)
