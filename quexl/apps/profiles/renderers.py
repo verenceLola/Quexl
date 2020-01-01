@@ -9,15 +9,15 @@ class ProfileRenderer(JSONRenderer):
     custom renderer class
     """
 
-    def render(self, data, accepted_media_type=None, render_context=None):
-        status_code = render_context["response"].status_code
-        profile_id = render_context["kwargs"]["username"]
-        operation = getattr(render_context["view"], "operation", None)
+    def render(self, data, accepted_media_type=None, renderer_context=None):
+        status_code = renderer_context["response"].status_code
+        profile_id = renderer_context["kwargs"]["username"]
+        operation = getattr(renderer_context["view"], "operation", None)
 
         data = (
             {
                 "message": "User Profile for user '%s'" % profile_id
-                if render_context["request"].method == "GET"
+                if renderer_context["request"].method == "GET"
                 else "%s successfull" % operation,
                 "data": data,
             }
@@ -28,5 +28,5 @@ class ProfileRenderer(JSONRenderer):
         )
 
         return super(ProfileRenderer, self).render(
-            data, accepted_media_type, render_context
+            data, accepted_media_type, renderer_context
         )
