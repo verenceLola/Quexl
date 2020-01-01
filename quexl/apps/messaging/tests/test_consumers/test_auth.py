@@ -4,7 +4,7 @@ from rest_framework.exceptions import AuthenticationFailed
 
 
 @pytest.mark.asyncio
-async def test_dm_auth_using_header_token(
+async def test_auth_using_header_token(
     websocket_connection, generate_access_token1
 ):
     token, user = generate_access_token1
@@ -15,7 +15,7 @@ async def test_dm_auth_using_header_token(
 
 
 @pytest.mark.asyncio
-async def test_dm_auth_using_query_param(
+async def test_auth_using_query_param(
     websocket_connection, generate_access_token1
 ):
     token, user = generate_access_token1
@@ -26,7 +26,7 @@ async def test_dm_auth_using_query_param(
 
 
 @pytest.mark.asyncio
-async def test_dm_auth_with_invalid_token(websocket_connection):
+async def test_auth_with_invalid_token(websocket_connection):
     invalid_token = "invalid&%%$token"
     with pytest.raises(
         AuthenticationFailed, match="WebSocket connection failed"

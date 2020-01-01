@@ -2,6 +2,7 @@
 configure common methods for testing
 """
 import pytest
+
 from quexl.apps.account.backends import JWTAuthentication
 
 
@@ -30,6 +31,17 @@ def generate_access_token1(create_db_user):
     jwt = JWTAuthentication()
     encoded_token = jwt.generate_token(user_details)
     return encoded_token, user1
+
+
+@pytest.fixture
+def generate_access_token2(create_db_user2):
+    """
+    """
+    user2 = create_db_user2
+    user_details = {"username": user2.username, "email": user2.email}
+    jwt = JWTAuthentication()
+    encoded_token = jwt.generate_token(user_details)
+    return encoded_token, user2
 
 
 @pytest.fixture
@@ -71,3 +83,28 @@ def create_db_user2(django_user_model):
     user2.is_active = True  # activate user account
     user2.save()
     return user2
+
+
+@pytest.fixture()
+def generate_new_token(django_user_model):
+    """
+    generate new jwt tokn for givn user credentials
+    """
+
+    def _generate_new_token(**kwargs):
+        username = kwargs.get("username")
+        details = {
+            "username": username,
+            "password": kwargs.get("password"),
+            "email": f"{username}@quexl.com",
+        }
+        user = django_user_model.objects.create(**details)
+        user.is_active = True  # activate user
+        user.save()
+        details.pop("password")  # remove password from jwt payload
+        jwt = JWTAuthentication()
+        token = jwt.generate_token(details)
+
+        return token, user
+
+    return _generate_new_token
