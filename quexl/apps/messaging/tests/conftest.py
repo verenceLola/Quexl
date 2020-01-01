@@ -46,7 +46,10 @@ def websocket_send_dm_message(websocket_connection):
     pytest fixture for sending websocket message
     """
 
-    async def _websocket_send_message(token, message, to):
+    async def _websocket_send_message(**kwargs):
+        token = kwargs.get("token")
+        message = kwargs.get("message")
+        to = kwargs.get("to")
         ws_msg = json.dumps({"to": to, "message": message})
         async with websocket_connection(
             endpoint="/chat/dm/", access_token=token
