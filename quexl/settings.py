@@ -98,12 +98,12 @@ SECRET_KEY = env.str("SECRET_KEY", "#gy%@@^ySGT@^")
 DATABASES = {"default": env.db()}
 
 # configure Django Channels
-REDIS_HOST = env.str("REDIS_HOST", "127.0.0.1")
-REDIS_PORT = env.int("REDIS_PORT", 6379)
+REDIS_URL = env.str("REDIS_URL", "redis://localhost:6379")
+
 CHANNEL_LAYERS = {
     "default": {
         "BACKEND": "channels_redis.core.RedisChannelLayer",
-        "CONFIG": {"hosts": [(REDIS_HOST, REDIS_PORT)]},
+        "CONFIG": {"hosts": [REDIS_URL]},
     }
 }
 ASGI_APPLICATION = "quexl.routing.application"

@@ -33,7 +33,6 @@ steps:
     env:
       DATABASE_URL: $(DATABASE_URL)
       DEBUG: $(DEBUG)
-      REDIS_PORT: $(AGENT_SERVICES_REDIS_PORTS_6379)
     displayName: 'Test with pytest'
 
   - task: PublishTestResults@2
