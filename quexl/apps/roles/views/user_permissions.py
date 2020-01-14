@@ -2,6 +2,8 @@ from django.contrib.auth import get_user_model
 from rest_framework import status
 from rest_framework.generics import GenericAPIView
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.request import Request
+from rest_framework.response import Response
 from rolepermissions.checkers import has_permission
 from rolepermissions.exceptions import RolePermissionScopeException
 from rolepermissions.permissions import available_perm_status
@@ -18,7 +20,7 @@ class PermissionsAPIView(GenericAPIView):
 
     permission_classes = (IsAuthenticated,)
 
-    def get(self, request, user_id):
+    def get(self, request: Request, user_id: str) -> Response:
         """
         get user permissions
         """
@@ -65,7 +67,7 @@ class PermissionsAPIView(GenericAPIView):
                 status_code=status.HTTP_404_NOT_FOUND,
             )
 
-    def post(self, request, user_id):
+    def post(self, request: Request, user_id: str) -> Response:
         """
         assign user permissions
         """
@@ -108,7 +110,7 @@ class PermissionsAPIView(GenericAPIView):
                 status_code=status.HTTP_400_BAD_REQUEST,
             )
 
-    def delete(self, request, user_id):
+    def delete(self, request: Request, user_id: str) -> Response:
         """
         revoke user permissions
         """

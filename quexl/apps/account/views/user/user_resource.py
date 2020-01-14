@@ -1,6 +1,7 @@
 from rest_framework import status
 from rest_framework.generics import GenericAPIView
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.request import Request
 from rest_framework.response import Response
 
 from quexl.apps.account.models import User
@@ -11,7 +12,7 @@ class UserResourceAPIView(GenericAPIView):
     permission_classes = (IsAuthenticated,)
     serializer_class = UserSerializer
 
-    def get(self, request, user_id, *args, **kwargs):
+    def get(self, request: Request, user_id: str, *args, **kwargs) -> Response:
         # There is nothing to validate or save here. Instead, we just want the
         # serializer to handle turning our `User` object into something that
         # can be JSONified and sent to the client.
@@ -43,7 +44,7 @@ class UserResourceAPIView(GenericAPIView):
                 status=status.HTTP_404_NOT_FOUND,
             )
 
-    def put(self, request, *args, **kwargs):
+    def put(self, request: Request, *args, **kwargs) -> Response:
         new_data = request.data
         self.operation = "Update user details"  # set operation name
         serializer = self.serializer_class(

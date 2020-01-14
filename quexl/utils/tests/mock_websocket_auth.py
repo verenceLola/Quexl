@@ -1,3 +1,5 @@
+from typing import Dict
+from typing import Union
 from urllib.parse import parse_qs
 
 from django.contrib.auth.models import AnonymousUser
@@ -7,7 +9,7 @@ from quexl.apps.account.backends import JWTAuthentication
 
 
 class MockWebSocketAuth:
-    async def connect(self):
+    async def connect(self) -> None:
         token = MockWebSocketAuth().get_token(self.scope)
         jwt = JWTAuthentication()
         await self.accept()
@@ -22,7 +24,7 @@ class MockWebSocketAuth:
             return
 
     @staticmethod
-    def get_token(scope) -> str:
+    def get_token(scope: Dict[str, Union[str, bytes, Dict[str, str]]]) -> str:
         """
         get token from headers or query string
         """
@@ -33,7 +35,7 @@ class MockWebSocketAuth:
         )
         return MockWebSocketAuth().parse_header_token(headers=headers)
 
-    def parse_header_token(self, headers) -> str:
+    def parse_header_token(self, headers: Dict[str, str]) -> str:
         """
         parse token in request header
         """
@@ -44,7 +46,9 @@ class MockWebSocketAuth:
         else:
             return ""
 
-    def parse_query_string_token(self, query_string, headers) -> str:
+    def parse_query_string_token(
+        self, query_string: bytes, headers: Dict[str, str]
+    ) -> str:
         """
         parse query token in query string and add to header if found
         """

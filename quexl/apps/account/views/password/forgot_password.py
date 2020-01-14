@@ -8,6 +8,7 @@ from django.template.loader import render_to_string
 from rest_framework import status
 from rest_framework.generics import GenericAPIView
 from rest_framework.permissions import AllowAny
+from rest_framework.request import Request
 from rest_framework.response import Response
 
 from quexl.apps.account.models import User
@@ -20,7 +21,7 @@ class ForgotPasswordView(GenericAPIView):
     permission_classes = (AllowAny,)
     serializer_class = ForgotPasswordSerializer
 
-    def post(self, request):
+    def post(self, request: Request) -> Response:
         """User Forgot Password"""
 
         try:

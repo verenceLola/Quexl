@@ -1,4 +1,5 @@
 from functools import wraps
+from typing import Callable
 
 from channels.db import database_sync_to_async
 from django.contrib.auth import get_user_model
@@ -10,7 +11,7 @@ class WebSocketUserExists:
     """
 
     @staticmethod
-    def __call__(func):
+    def __call__(func: Callable) -> Callable:
         @wraps(func)
         async def user_exists(*args, **kwargs):
             self, json_data = args

@@ -15,7 +15,7 @@ class CurrentUserRetriveAPIView(RetrieveAPIView):
     permission_classes = (IsAuthenticated,)
     serializer_class = MeSerializer
 
-    def get_object(self):
+    def get_object(self) -> User:
         """
         retrive current user info
         """

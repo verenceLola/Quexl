@@ -1,11 +1,12 @@
-from django.db import models
-from quexl.apps.account.models import User
 from django.core.validators import RegexValidator
-from django_countries.fields import CountryField
-from phonenumber_field.modelfields import PhoneNumberField
-from quexl.helpers.fancy_generator import fancy_id_generator
-from languages.fields import LanguageField
+from django.db import models
 from django.utils.timezone import now
+from django_countries.fields import CountryField
+from languages.fields import LanguageField
+from phonenumber_field.modelfields import PhoneNumberField
+
+from quexl.apps.account.models import User
+from quexl.helpers.fancy_generator import fancy_id_generator
 
 
 class Profile(models.Model):
@@ -73,7 +74,7 @@ class Address(models.Model):
         ordering = ("pk",)
 
     @property
-    def address(self):
+    def address(self) -> str:
         return "%s" % self.city
 
     def __repr__(self):
@@ -115,7 +116,7 @@ class WorkEducationAbstract(models.Model):
         abstract = True
 
     @property
-    def on_going(self):
+    def on_going(self) -> bool:
         """
         determine if activity is on_going or not
         """

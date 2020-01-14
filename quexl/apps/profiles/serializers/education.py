@@ -30,7 +30,7 @@ class EducationSerializer(CountrySerializerWrapper):
     start_date = serializers.DateTimeField(required=True)
     end_date = serializers.DateTimeField()
 
-    def create(self, validated_data: dict):
+    def create(self, validated_data: dict) -> Education:
         """
         create user education
         """

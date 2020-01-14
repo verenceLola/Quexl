@@ -1,3 +1,6 @@
+from typing import Any
+from typing import Optional
+
 from rest_framework import status
 from rest_framework.renderers import JSONRenderer
 
@@ -9,7 +12,12 @@ class ProfileRenderer(JSONRenderer):
     custom renderer class
     """
 
-    def render(self, data, accepted_media_type=None, renderer_context=None):
+    def render(
+        self,
+        data: Any,
+        accepted_media_type: Optional[str] = None,
+        renderer_context=None,
+    ) -> bytes:
         status_code = renderer_context["response"].status_code
         profile_id = renderer_context["kwargs"]["username"]
         operation = getattr(renderer_context["view"], "operation", None)

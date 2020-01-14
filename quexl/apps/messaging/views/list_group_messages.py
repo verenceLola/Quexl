@@ -1,4 +1,5 @@
 from django.db.models import Q
+from django.db.models.query import QuerySet
 from rest_framework.generics import ListAPIView
 from rest_framework.permissions import IsAuthenticated
 
@@ -18,7 +19,7 @@ class ListGroupMessages(ListAPIView):
     renderer_classes = (DefaultRenderer,)
     pluralized_name = "group messages"
 
-    def get_queryset(self):
+    def get_queryset(self) -> QuerySet:
         """
         return all user groups
         """

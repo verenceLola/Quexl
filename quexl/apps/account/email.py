@@ -1,8 +1,11 @@
+from typing import Dict
+
 from django.conf import settings
 from django.contrib.sites.shortcuts import get_current_site
 from django.core.mail import send_mail
 from django.template.loader import render_to_string
 from rest_framework import status
+from rest_framework.request import Request
 from rest_framework.response import Response
 
 from quexl.apps.account.backends import JWTAuthentication
@@ -10,7 +13,7 @@ from quexl.apps.account.backends import JWTAuthentication
 
 class Email:
     @staticmethod
-    def send_email(request, user):
+    def send_email(request: Request, user: Dict[str, str]) -> None:
         # sends email with the activation link with the token
         subject = "Quexl Account Activation"
         message = "Please verify your account "

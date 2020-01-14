@@ -2,6 +2,7 @@ from django.contrib.auth import get_user_model
 from rest_framework import status
 from rest_framework.generics import GenericAPIView
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.request import Request
 from rest_framework.response import Response
 from rolepermissions.checkers import has_permission
 from rolepermissions.exceptions import RoleDoesNotExist
@@ -22,7 +23,7 @@ class UserRoleAPIView(GenericAPIView):
     permission_classes = (IsAuthenticated,)
     serializer_class = RolesSerializer
 
-    def post(self, request, user_id):
+    def post(self, request: Request, user_id: str) -> Response:
         """
         assign user roles
         """
@@ -67,7 +68,7 @@ class UserRoleAPIView(GenericAPIView):
                 status_code=status.HTTP_404_NOT_FOUND,
             )
 
-    def get(self, request, user_id):
+    def get(self, request: Request, user_id: str) -> Response:
         """"
         get user roles
         """
@@ -117,7 +118,7 @@ class UserRoleAPIView(GenericAPIView):
                 status_code=status.HTTP_404_NOT_FOUND,
             )
 
-    def delete(self, request, user_id):
+    def delete(self, request: Request, user_id: str) -> Response:
         """
         remove user role
         """

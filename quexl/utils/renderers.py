@@ -1,5 +1,13 @@
+from typing import Any
+from typing import Dict
+from typing import List
+from typing import Optional
+from typing import Union
+
 from rest_framework import status
+from rest_framework.exceptions import ErrorDetail
 from rest_framework.renderers import JSONRenderer
+from rest_framework.utils.serializer_helpers import ReturnList
 
 message_map = lambda view: lambda status_code: {  # noqa
     "POST": "%s created successfully" % view.name.capitalize(),
@@ -13,7 +21,12 @@ class DefaultRenderer(JSONRenderer):
     custom renderer class for application views
     """
 
-    def render(self, data, accepted_media_type=None, renderer_context=None):
+    def render(
+        self,
+        data: Union[Dict[str, Union[str, List[ErrorDetail]]], ReturnList],
+        accepted_media_type: Optional[str] = None,
+        renderer_context: Optional[Dict[str, Any]] = None,
+    ) -> bytes:
         """
         format response data for application views
         """

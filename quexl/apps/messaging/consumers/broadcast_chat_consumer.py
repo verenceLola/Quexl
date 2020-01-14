@@ -15,7 +15,7 @@ class BroadcastChatConsumer(AsyncJsonWebsocketConsumer):
         """
         await self.send_json({"message": "connection established"})
 
-    async def disconnect(self, close_code):
+    async def disconnect(self, close_code: int) -> None:
         """
         close client connection
         """
@@ -24,14 +24,14 @@ class BroadcastChatConsumer(AsyncJsonWebsocketConsumer):
         )
 
     @VerifyJSON()
-    async def receive(self, data: dict):
+    async def receive(self, data: dict) -> None:
         to_users = data.get("to")
         message = data.get("message")
         sender = self.scope["user"]
         broadcastMsg = BroadCastMessage(self, message, sender)
         await broadcastMsg(to_users)
 
-    async def chat_message(self, event: dict):
+    async def chat_message(self, event: dict) -> None:
         message = (
             {
                 "message": json.loads(event["message"]),

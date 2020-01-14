@@ -1,4 +1,5 @@
 from django.db.models import Q
+from django.db.models.query import QuerySet
 from rest_framework.generics import ListAPIView
 from rest_framework.permissions import IsAuthenticated
 
@@ -15,7 +16,7 @@ class ListDMMessagesAPIView(ListAPIView):
     pluralized_name = "messages"
     renderer_classes = (MessagesRenderer,)
 
-    def get_queryset(self):
+    def get_queryset(self) -> QuerySet:
         """
         return all messages where current user is participant
         """

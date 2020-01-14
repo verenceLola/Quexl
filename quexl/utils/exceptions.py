@@ -1,14 +1,19 @@
 """
 custom exception handler for views
 """
+from typing import Any
+from typing import Dict
+from typing import Union
+
 from django.http import Http404
+from rest_framework import exceptions
 from rest_framework import status
+from rest_framework.exceptions import NotAuthenticated
+from rest_framework.exceptions import ValidationError
 from rest_framework.response import Response
-from rest_framework.validators import ValidationError
 from rest_framework.views import exception_handler
 
 from quexl.helpers.api_response import APIResponse
-from rest_framework import exceptions
 
 view_map = {
     "profiles": lambda operation, response, **kwargs: APIResponse.get_error_response(
@@ -19,7 +24,9 @@ view_map = {
 }
 
 
-def custom_exception_handler(exc, context):
+def custom_exception_handler(
+    exc: Union[ValidationError, NotAuthenticated], context: Dict[str, Any]
+) -> Response:
     """
     custom exception handler for views
     """
