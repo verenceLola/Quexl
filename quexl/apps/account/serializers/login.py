@@ -1,8 +1,12 @@
+from collections import OrderedDict
+from typing import Dict
+
 from django.contrib.auth import authenticate
 from rest_framework import serializers
 
+from quexl.apps.account.models import User
+
 from ..backends import JWTAuthentication
-from ..models import User
 
 
 class LoginSerializer(serializers.Serializer):
@@ -12,7 +16,7 @@ class LoginSerializer(serializers.Serializer):
     username = serializers.CharField(max_length=255, read_only=True)
     password = serializers.CharField(max_length=128, write_only=True)
 
-    def validate(self, data):
+    def validate(self, data: OrderedDict) -> Dict[str, str]:
         """
         validate details
         """
@@ -43,7 +47,7 @@ class LoginSerializer(serializers.Serializer):
 
         return {"email": user.email, "username": user.username, "token": token}
 
-    def validate_email(self, value):
+    def validate_email(self, value: str) -> User:
         """
         validate user password
         """

@@ -1,4 +1,5 @@
 from functools import wraps
+from typing import Callable
 
 from channels.db import database_sync_to_async
 
@@ -7,7 +8,7 @@ from quexl.apps.messaging.models import Thread
 
 class IsGroupMember:
     @staticmethod
-    def __call__(func):
+    def __call__(func: Callable) -> Callable:
         @wraps(func)
         async def ensure_group_member(self, json_data):
             """

@@ -1,7 +1,13 @@
+from collections import OrderedDict
+from datetime import datetime
+from typing import Dict
+from typing import Union
+
 from django.utils import timezone
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 
+from quexl.apps.profiles.models import Profile
 from quexl.apps.profiles.models import WorkExperience
 
 from .country_serializer_wrapper import CountrySerializerWrapper
@@ -24,7 +30,9 @@ class WorkExperienceSerializer(CountrySerializerWrapper):
     country = serializers.CharField(required=True)
     role = serializers.CharField(required=True)
 
-    def create(self, validated_data):
+    def create(
+        self, validated_data: Dict[str, Union[str, datetime, Profile]]
+    ) -> WorkExperience:
         """
         create user work experience
         """
@@ -42,7 +50,7 @@ class WorkExperienceSerializer(CountrySerializerWrapper):
 
         return work
 
-    def validate_start_date(self, value):
+    def validate_start_date(self, value: datetime) -> datetime:
         """
         validate work start date
         """
@@ -51,7 +59,7 @@ class WorkExperienceSerializer(CountrySerializerWrapper):
 
         return value
 
-    def validate(self, data: dict):
+    def validate(self, data: dict) -> OrderedDict:
         """
         validate work experience data
         """

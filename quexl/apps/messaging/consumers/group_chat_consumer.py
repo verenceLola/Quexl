@@ -1,4 +1,5 @@
 import json
+from typing import Dict
 
 from channels.generic.websocket import AsyncJsonWebsocketConsumer
 from django.core.serializers.json import DjangoJSONEncoder
@@ -17,7 +18,7 @@ class GroupChatConsumer(AsyncJsonWebsocketConsumer):
         """
         await self.send_json({"message": "connection established"})
 
-    async def disconnect(self, close_code):
+    async def disconnect(self, close_code: int) -> None:
         """
         close websocket connection
         """
@@ -27,7 +28,7 @@ class GroupChatConsumer(AsyncJsonWebsocketConsumer):
 
     @VerifyJSON()
     @IsGroupMember()
-    async def receive(self, json_data):
+    async def receive(self, json_data: Dict[str, str]) -> None:
         """
         process recieved text
         """
@@ -53,6 +54,6 @@ class GroupChatConsumer(AsyncJsonWebsocketConsumer):
             },
         )
 
-    async def chat_message(self, event):
+    async def chat_message(self, event: Dict[str, str]) -> None:
         message = {"message": json.loads(event["message"])}
         await self.send_json(message)

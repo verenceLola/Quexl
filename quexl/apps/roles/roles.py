@@ -19,7 +19,7 @@ class SiteAdminRole(AbstractUserRole):
         return "Roles for Site Admin"
 
     @classmethod
-    def get_name(cls):
+    def get_name(cls) -> str:
         return "site_admin"
 
 
@@ -30,7 +30,7 @@ class DeveloperRole(AbstractUserRole):
     }
 
     @classmethod
-    def get_description(cls):
+    def get_description(cls) -> str:
         """
         return description of role
         """
@@ -38,7 +38,7 @@ class DeveloperRole(AbstractUserRole):
         return "Roles for application developers"
 
     @classmethod
-    def get_name(cls):
+    def get_name(cls) -> str:
         return "developer"
 
 
@@ -46,7 +46,7 @@ class RegularUserRole(AbstractUserRole):
     available_permissions = {}
 
     @classmethod
-    def get_description(cls):
+    def get_description(cls) -> str:
         """
         return description of role
         """
@@ -54,5 +54,5 @@ class RegularUserRole(AbstractUserRole):
         return "Roles for regular/ default user role"
 
     @classmethod
-    def get_name(cls):
+    def get_name(cls) -> str:
         return "regular_user"

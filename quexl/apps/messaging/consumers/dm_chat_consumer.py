@@ -1,4 +1,5 @@
 import json
+from typing import Dict
 
 from channels.generic.websocket import AsyncJsonWebsocketConsumer
 from django.core.serializers.json import DjangoJSONEncoder
@@ -18,7 +19,7 @@ class DMChatConsumer(AsyncJsonWebsocketConsumer):
         """
         await self.send_json({"message": "connection established"})
 
-    async def disconnect(self, close_code):
+    async def disconnect(self, close_code: int) -> None:
         """
         close client connection
         """
@@ -28,7 +29,7 @@ class DMChatConsumer(AsyncJsonWebsocketConsumer):
 
     @VerifyJSON()
     @WebSocketUserExists()
-    async def receive(self, json_data):
+    async def receive(self, json_data: Dict[str, str]) -> None:
         """
         process recieved text
         """
@@ -59,6 +60,6 @@ class DMChatConsumer(AsyncJsonWebsocketConsumer):
             },
         )
 
-    async def chat_message(self, event):
+    async def chat_message(self, event: Dict[str, str]) -> None:
         message = {"message": json.loads(event["message"])}
         await self.send_json(message)

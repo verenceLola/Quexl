@@ -1,6 +1,7 @@
 import json
 from functools import wraps
 from json import JSONDecodeError
+from typing import Callable
 
 
 class VerifyJSON:
@@ -9,7 +10,7 @@ class VerifyJSON:
     """
 
     @staticmethod
-    def __call__(func):
+    def __call__(func: Callable) -> Callable:
         @wraps(func)
         async def verify_json(self, **kwargs):
             data = kwargs.get("text_data", "")

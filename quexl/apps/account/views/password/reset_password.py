@@ -3,6 +3,7 @@ from django.conf import settings
 from rest_framework import status
 from rest_framework.generics import GenericAPIView
 from rest_framework.permissions import AllowAny
+from rest_framework.request import Request
 from rest_framework.response import Response
 
 from quexl.apps.account.models import User
@@ -15,7 +16,7 @@ class ResetPasswordView(GenericAPIView):
     serializer_class = ResetPasswordSerializer
     operation = "Password reset"
 
-    def put(self, request, token, *args, **kwargs):
+    def put(self, request: Request, token: str, *args, **kwargs) -> Response:
 
         try:
             new_password = request.data.get("password")

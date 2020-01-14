@@ -8,7 +8,7 @@ class CountrySerializerWrapper(serializers.ModelSerializer):
     wrapper for related fields serializers
     """
 
-    def validate_country(self, value):
+    def validate_country(self, value: str) -> str:
         """
         validate country code
         """

@@ -2,6 +2,7 @@ from django.utils.timezone import now
 from rest_framework import status
 from rest_framework.generics import GenericAPIView
 from rest_framework.permissions import AllowAny
+from rest_framework.request import Request
 from rest_framework.response import Response
 
 from quexl.apps.account.backends import JWTAuthentication
@@ -16,7 +17,7 @@ class LoginAPIView(GenericAPIView):
     operation = "Login"
     renderer_classes = (UserJSONRenderer,)
 
-    def post(self, request):
+    def post(self, request: Request) -> Response:
         """Login a user"""
         email, password = (
             request.data.get("email", None),

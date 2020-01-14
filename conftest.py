@@ -1,13 +1,18 @@
 """
 configure common methods for testing
 """
+from typing import Callable
+from typing import Tuple
+from typing import Type
+
 import pytest
 
 from quexl.apps.account.backends import JWTAuthentication
+from quexl.apps.account.models import User
 
 
 @pytest.fixture
-def create_db_user(django_user_model):
+def create_db_user(django_user_model: Type[User]) -> User:
     """
     create a db user
     """
@@ -23,7 +28,7 @@ def create_db_user(django_user_model):
 
 
 @pytest.fixture
-def generate_access_token1(create_db_user):
+def generate_access_token1(create_db_user: User) -> Tuple[str, User]:
     """
     """
     user1 = create_db_user
@@ -34,7 +39,7 @@ def generate_access_token1(create_db_user):
 
 
 @pytest.fixture
-def generate_access_token2(create_db_user2):
+def generate_access_token2(create_db_user2: User) -> Tuple[str, User]:
     """
     """
     user2 = create_db_user2
@@ -45,7 +50,7 @@ def generate_access_token2(create_db_user2):
 
 
 @pytest.fixture
-def create_superuser(django_user_model):
+def create_superuser(django_user_model: Type[User]) -> User:
     superuser_details = {
         "username": "superuser1",
         "password": "passSuper3",
@@ -58,7 +63,7 @@ def create_superuser(django_user_model):
 
 
 @pytest.fixture()
-def generate_superuser_access_token(create_superuser):
+def generate_superuser_access_token(create_superuser: User) -> str:
     """
     generate superuser token
     """
@@ -70,7 +75,7 @@ def generate_superuser_access_token(create_superuser):
 
 
 @pytest.fixture
-def create_db_user2(django_user_model):
+def create_db_user2(django_user_model: Type[User]) -> User:
     """
     create a db user
     """
@@ -86,7 +91,7 @@ def create_db_user2(django_user_model):
 
 
 @pytest.fixture()
-def generate_new_token(django_user_model):
+def generate_new_token(django_user_model: Type[User]) -> Callable:
     """
     generate new jwt tokn for givn user credentials
     """

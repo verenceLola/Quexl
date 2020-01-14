@@ -26,11 +26,11 @@ class PushID(object):
         "_abcdefghijklmnopqrstuvwxyz"
     )
 
-    def __init__(self):
+    def __init__(self) -> None:
         self.last_push_time = 0
         self.last_rand_chars = numpy.empty(12, dtype=int)
 
-    def next_id(self):
+    def next_id(self) -> str:
         """Generates a unique_id.
 
         Returns:
@@ -50,7 +50,7 @@ class PushID(object):
 
         return unique_id
 
-    def get_unique_id(self, now):
+    def get_unique_id(self, now: int) -> str:
         """Creates a unique id which is of length 8.
 
         Args:
@@ -69,7 +69,7 @@ class PushID(object):
 
         return unique_id
 
-    def set_last_rand_char(self, duplicate_time):
+    def set_last_rand_char(self, duplicate_time: bool) -> None:
         """Updates the last random characters.
 
         Args:

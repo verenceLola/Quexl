@@ -1,10 +1,14 @@
 import json
 from contextlib import asynccontextmanager
+from typing import Dict
+from typing import Union
 
 from channels.db import database_sync_to_async
 from channels.generic.websocket import AsyncJsonWebsocketConsumer
 from django.contrib.auth import get_user_model
 from django.core.serializers.json import DjangoJSONEncoder
+
+from quexl.apps.account.models import User
 
 from .create_thread import CreateThread
 from .save_message import SaveMessage
@@ -16,16 +20,16 @@ class BroadCastMessage:
     """
 
     def __init__(
-        self, consumer: AsyncJsonWebsocketConsumer, message: str, sender
-    ):
+        self, consumer: AsyncJsonWebsocketConsumer, message: str, sender: User
+    ) -> None:
         self.consumer = consumer  # noqa
         self.message = message
         self.sender = sender
         self.FAILED_USERS = []  # save non-exisiting usernames
 
     async def broadcast_message(
-        self, user
-    ):  # TODO: Fix multiple broadcasts to sender
+        self, user: Dict[str, str]
+    ) -> None:  # TODO: Fix multiple broadcasts to sender
         """
         broadcast message to every user
         """
@@ -50,7 +54,7 @@ class BroadCastMessage:
                 },
             )
 
-    async def save_message(self, user):
+    async def save_message(self, user: Union[User, Dict[str, str]]) -> None:
         """
         save each user message to db
         """
@@ -69,7 +73,7 @@ class BroadCastMessage:
             self.FAILED_USERS.append(user)
 
     @asynccontextmanager
-    async def processMessages(self, user):
+    async def processMessages(self, user: Dict[str, str]) -> None:
         try:
             yield self.save_message(user)
         finally:

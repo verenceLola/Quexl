@@ -1,6 +1,9 @@
+from typing import Dict
+
 from rest_framework import serializers
 
-from ..models import User
+from quexl.apps.account.models import User
+
 from .permissions import GroupSerializer
 from .permissions import PermissionsSerializer
 
@@ -18,7 +21,7 @@ class UserSerializer(serializers.ModelSerializer):
         model = User
         fields = ("email", "username", "password")
 
-    def update(self, instance, validated_data):
+    def update(self, instance: User, validated_data: Dict[str, str]) -> User:
         """Performs an update on a User."""
         password = validated_data.pop("password", None)
 

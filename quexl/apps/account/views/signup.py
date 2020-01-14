@@ -1,6 +1,7 @@
 from rest_framework import status
 from rest_framework.generics import GenericAPIView
 from rest_framework.permissions import AllowAny
+from rest_framework.request import Request
 from rest_framework.response import Response
 
 from quexl.apps.account.email import Email
@@ -16,7 +17,7 @@ class SignUpAPIView(GenericAPIView):
     serializer_class = RegistrationSerializer
     operation = "Signup"
 
-    def post(self, request, **kwargs):
+    def post(self, request: Request, **kwargs) -> Response:
         """ Signup a new user """
         email, username, password = (
             request.data.get("email", None),
@@ -39,7 +40,7 @@ class SignUpAPIView(GenericAPIView):
             status=status.HTTP_201_CREATED,
         )
 
-    def get(self, request):
+    def get(self, request: Request) -> Response:
 
         return Response(
             {"message": "Only POST requests are allowed to this endpoint."},

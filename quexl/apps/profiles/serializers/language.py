@@ -1,6 +1,10 @@
+from typing import Dict
+from typing import Union
+
 from rest_framework import serializers
 
 from quexl.apps.profiles.models import Language
+from quexl.apps.profiles.models import Profile
 
 
 class LanguageSerializer(serializers.ModelSerializer):
@@ -12,7 +16,9 @@ class LanguageSerializer(serializers.ModelSerializer):
         fields = ("name", "fluency")
         model = Language
 
-    def create(self, validated_data):
+    def create(
+        self, validated_data: Dict[str, Union[str, Profile]]
+    ) -> Language:
         """
         create language instance and save to db with unique fields handled
         """

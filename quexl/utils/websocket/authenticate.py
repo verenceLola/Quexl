@@ -1,9 +1,10 @@
 from functools import wraps
+from typing import Callable
 
 
 class Authenticate:
     @staticmethod
-    def __call__(func, **kwargs):
+    def __call__(func: Callable, **kwargs) -> Callable:
         @wraps(func)
         async def authenticate(self, **kwargs):
             await self.accept()

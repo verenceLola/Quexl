@@ -1,14 +1,16 @@
+from typing import Dict
+
 from rest_framework import serializers
 from rest_framework import validators
 from rest_framework.validators import UniqueValidator
 
-from ..models import User
+from quexl.apps.account.models import User
 
 
 class RegistrationSerializer(serializers.ModelSerializer):
     """Serializers registration requests and creates a new user."""
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, **kwargs) -> None:
         super(RegistrationSerializer, self).__init__(*args, **kwargs)
 
         for field in self.fields:
@@ -63,7 +65,7 @@ class RegistrationSerializer(serializers.ModelSerializer):
         # or response, including fields specified explicitly above.
         fields = ["email", "username", "password", "token"]
 
-    def create(self, validated_data):
+    def create(self, validated_data: Dict[str, str]) -> User:
         # Use the `create_user` method we wrote earlier to create a new user.
         user = User.objects.create_user(**validated_data)
 

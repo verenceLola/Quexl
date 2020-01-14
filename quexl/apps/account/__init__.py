@@ -11,7 +11,7 @@ class AuthenticationAppConfig(AppConfig):
     name = "quexl.apps.account"
     verbose_name = "Account"
 
-    def ready(self):
+    def ready(self) -> None:
         """
         register signal handlers when app is ready
         """

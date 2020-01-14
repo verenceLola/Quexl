@@ -1,7 +1,10 @@
-from django.db import models
-from quexl.helpers.fancy_generator import fancy_id_generator
+from typing import Type
+
 from django.contrib.auth import get_user_model
+from django.db import models
 from django.db.models.signals import post_save
+
+from quexl.helpers.fancy_generator import fancy_id_generator
 
 
 class Thread(models.Model):
@@ -67,7 +70,7 @@ class Message(models.Model):
     msg_status = models.CharField(max_length=5, default="S")
 
     @property
-    def status(self):
+    def status(self) -> str:
         """
         return message status
         """
@@ -104,7 +107,9 @@ class Message(models.Model):
         )
 
 
-def update_last_message_datetime(sender, instance, created, **kwargs):
+def update_last_message_datetime(
+    sender: Type[Message], instance: Message, created: bool, **kwargs
+) -> None:
     """
     Update Thread's last_message field when
     a new message is sent.

@@ -2,6 +2,7 @@ import jwt
 from rest_framework import status
 from rest_framework.generics import GenericAPIView
 from rest_framework.permissions import AllowAny
+from rest_framework.request import Request
 from rest_framework.response import Response
 
 from quexl.apps.account.backends import JWTAuthentication
@@ -14,7 +15,7 @@ class UserActivationAPIView(GenericAPIView):
     permission_classes = (AllowAny,)
     operation = "Account activation"
 
-    def get(self, request, token, *args, **kwargs):
+    def get(self, request: Request, token: str, *args, **kwargs) -> Response:
         """ Method for getting user token and activating them. """
 
         try:
