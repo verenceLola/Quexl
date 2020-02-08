@@ -41,7 +41,6 @@ def custom_exception_handler(
         operation = context[
             "view"
         ].operation  # every view method should have an operation
-
         return Response(
             {
                 "message": "%s failed. Fix the error(s) below" % operation,

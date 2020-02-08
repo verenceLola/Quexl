@@ -2,7 +2,8 @@
 quexl URL Configuration
 """
 from django.contrib import admin
-from django.urls import path, include
+from django.urls import include
+from django.urls import path
 
 urlpatterns = [
     path("admin/", admin.site.urls),
@@ -11,4 +12,5 @@ urlpatterns = [
     path("api/", include("quexl.apps.roles.urls")),
     path("api/users/", include("quexl.apps.profiles.urls")),
     path("api/user/", include("quexl.apps.messaging.routing")),
+    path("api/", include("quexl.apps.services.urls")),
 ]
