@@ -17,7 +17,6 @@ def test_reset_password(
     """
     test reset user password
     """
-    # user = create_db_user
     reset_url = reverse("authentication:reset_password", args=[reset_token])
     response = client.put(reset_url)
     assert response.data == expected_response

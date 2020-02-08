@@ -108,3 +108,6 @@ venv.bak/
 
 # images
 images/
+
+# file uploads
+uploads/

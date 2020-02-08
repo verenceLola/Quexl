@@ -15,8 +15,8 @@ from quexl.apps.services.models import Category
 from quexl.apps.services.models import DataFormat
 from quexl.apps.services.models import Gallery
 from quexl.apps.services.models import OutputFile
-from quexl.apps.services.models import ParamerterOption
-from quexl.apps.services.models import ParamerterTemplate
+from quexl.apps.services.models import ParameterOption
+from quexl.apps.services.models import ParameterTemplate
 from quexl.apps.services.models import Service
 
 
@@ -180,7 +180,7 @@ class ParameterTemplateSerializer(serializers.ModelSerializer):
     """
 
     class Meta:
-        model = ParamerterTemplate
+        model = ParameterTemplate
         fields = "__all__"
 
 
@@ -190,7 +190,7 @@ class ParameterOptionSerializer(PriceSerializerWrapper):
     """
 
     class Meta:
-        model = ParamerterOption
+        model = ParameterOption
         fields = "__all__"
 
 

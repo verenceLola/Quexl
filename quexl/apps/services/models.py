@@ -78,7 +78,8 @@ class Service(models.Model):
         primary_key=True,
         editable=False,
     )
-    name = models.CharField(unique=True, max_length=50)
+    name = models.CharField(unique=True, max_length=100)
+    api_endpoint = models.CharField(max_length=150)
     seller = models.ForeignKey(User, on_delete=models.CASCADE)
     description = models.CharField(max_length=300, blank=True)
     price = MoneyField(
@@ -126,7 +127,28 @@ class OutputFile(models.Model):
     data_format = models.ForeignKey(DataFormat, on_delete=models.CASCADE)
 
 
-class ParamerterTemplate(models.Model):
+class ParameterOption(models.Model):
+    """
+    Parameter option model
+    """
+
+    id = models.CharField(
+        db_index=True,
+        max_length=256,
+        default=fancy_id_generator,
+        primary_key=True,
+        editable=False,
+    )
+    short_name = models.CharField(max_length=200)
+    option_text = models.CharField(blank=True, max_length=200)
+    price = MoneyField(
+        max_digits=19, decimal_places=4, default=0.0000, default_currency="USD"
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+
+class ParameterTemplate(models.Model):
     """
     Parameter Template model
     """
@@ -137,6 +159,9 @@ class ParamerterTemplate(models.Model):
         default=fancy_id_generator,
         primary_key=True,
         editable=False,
+    )
+    parameter_option = models.ForeignKey(
+        ParameterOption, on_delete=models.CASCADE
     )
     name = models.CharField(max_length=50)
     service = models.ForeignKey(Service, on_delete=models.CASCADE)
@@ -149,27 +174,5 @@ class ParamerterTemplate(models.Model):
     rows_min = models.IntegerField(default=0)
     from_history = models.BooleanField(default=False)
     from_from_field = models.BooleanField(default=False)
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-
-
-class ParamerterOption(models.Model):
-    """
-    Parameter option model
-    """
-
-    id = models.CharField(
-        db_index=True,
-        max_length=256,
-        default=fancy_id_generator,
-        primary_key=True,
-        editable=False,
-    )
-    parameter = models.ForeignKey(ParamerterTemplate, on_delete=models.CASCADE)
-    short_name = models.CharField(max_length=200)
-    option_text = models.CharField(blank=True, max_length=200)
-    price = MoneyField(
-        max_digits=19, decimal_places=4, default=0.0000, default_currency="USD"
-    )
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
