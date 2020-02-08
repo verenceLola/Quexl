@@ -15,7 +15,7 @@ def test_list_parameter_template(
     resp = json.loads(response.content.decode())
     assert response.status_code == 200
     assert resp["status"] == "success"
-    assert resp["data"][0]["name"] == "Parameter template"
+    assert resp["data"][0]["name"] == "Image"
 
 
 def test_get_an_parameter_template(
@@ -32,7 +32,7 @@ def test_get_an_parameter_template(
     resp = json.loads(response.content.decode())
     assert response.status_code == 200
     assert resp["status"] == "success"
-    assert resp["data"]["name"] == "Parameter template"
+    assert resp["data"]["name"] == "Image"
 
 
 def test_create_parameter_template_with_errors(client, generate_access_token1):

@@ -3,18 +3,20 @@ services views
 """
 from rest_framework import response
 from rest_framework import status
+from rest_framework.generics import ListAPIView
 from rest_framework.generics import ListCreateAPIView
 from rest_framework.generics import RetrieveUpdateDestroyAPIView
 from rest_framework.permissions import IsAuthenticated
 
+from quexl.apps.orders.models import Order
+from quexl.apps.orders.serializers import OrderSerializer
 from quexl.apps.services.models import Category
 from quexl.apps.services.models import DataFormat
 from quexl.apps.services.models import Gallery
 from quexl.apps.services.models import OutputFile
-from quexl.apps.services.models import ParamerterOption
-from quexl.apps.services.models import ParamerterTemplate
+from quexl.apps.services.models import ParameterOption
+from quexl.apps.services.models import ParameterTemplate
 from quexl.apps.services.models import Service
-from quexl.apps.services.permissions import IsSellerOrReadOnly
 from quexl.apps.services.renderers import ServicesRenderer
 from quexl.apps.services.serializers import CategorySerializer
 from quexl.apps.services.serializers import DataFormatSerializer
@@ -23,6 +25,7 @@ from quexl.apps.services.serializers import OutputFileSerializer
 from quexl.apps.services.serializers import ParameterOptionSerializer
 from quexl.apps.services.serializers import ParameterTemplateSerializer
 from quexl.apps.services.serializers import ServicesSerializer
+from quexl.helpers.permissions import IsSellerOrReadOnly
 
 
 class RetrieveUpdateDestroyAPIViewWrapper(RetrieveUpdateDestroyAPIView):
@@ -122,6 +125,23 @@ class ServicesDetail(RetrieveUpdateDestroyAPIViewWrapper):
         )
 
 
+class ServiceOrdersList(ListAPIView):
+    """view orders for a specific service"""
+
+    name = "seller order"
+    pluralized_name = "seller orders"
+    permission_classes = (IsAuthenticated, IsSellerOrReadOnly)
+    renderer_classes = (ServicesRenderer,)
+    serializer_class = OrderSerializer
+
+    def get_queryset(self):
+        service = self.request.query_params.get("service")
+        orders = Order.objects.filter(service=service).filter(
+            service__seller=self.request.user
+        )
+        return orders
+
+
 class DataFormatList(ListCreateAPIView):
     """
     services view for listing and creating data formats
@@ -156,7 +176,7 @@ class ParameterTemplateList(ListCreateAPIView):
     name = "parameter_template"
     pluralized_name = "parameter_templates"
     permission_classes = (IsAuthenticated,)
-    queryset = ParamerterTemplate.objects.all()
+    queryset = ParameterTemplate.objects.all()
     renderer_classes = (ServicesRenderer,)
     serializer_class = ParameterTemplateSerializer
 
@@ -172,7 +192,7 @@ class ParameterTemplateDetail(RetrieveUpdateDestroyAPIViewWrapper):
     """
 
     permission_classes = (IsAuthenticated,)
-    queryset = ParamerterTemplate.objects.all()
+    queryset = ParameterTemplate.objects.all()
     serializer_class = ParameterTemplateSerializer
     renderer_classes = (ServicesRenderer,)
     name = "parameter template"
@@ -187,7 +207,7 @@ class ParameterOptionList(ListCreateAPIView):
     name = "parameter_option"
     pluralized_name = "parameter_options"
     permission_classes = (IsAuthenticated,)
-    queryset = ParamerterOption.objects.all()
+    queryset = ParameterOption.objects.all()
     serializer_class = ParameterOptionSerializer
     renderer_classes = (ServicesRenderer,)
 
@@ -203,7 +223,7 @@ class ParameterOptionDetail(RetrieveUpdateDestroyAPIViewWrapper):
     """
 
     permission_classes = (IsAuthenticated,)
-    queryset = ParamerterOption.objects.all()
+    queryset = ParameterOption.objects.all()
     serializer_class = ParameterOptionSerializer
     renderer_classes = (ServicesRenderer,)
     name = "parameter option"

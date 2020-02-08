@@ -13,4 +13,5 @@ urlpatterns = [
     path("api/users/", include("quexl.apps.profiles.urls")),
     path("api/user/", include("quexl.apps.messaging.routing")),
     path("api/", include("quexl.apps.services.urls")),
+    path("api/", include("quexl.apps.orders.urls")),
 ]

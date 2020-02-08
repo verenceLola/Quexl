@@ -15,6 +15,7 @@ from quexl.apps.services.views import ParameterOptionDetail
 from quexl.apps.services.views import ParameterOptionList
 from quexl.apps.services.views import ParameterTemplateDetail
 from quexl.apps.services.views import ParameterTemplateList
+from quexl.apps.services.views import ServiceOrdersList
 from quexl.apps.services.views import ServicesDetail
 from quexl.apps.services.views import ServicesList
 
@@ -24,6 +25,7 @@ urlpatterns = [
     path("categories/", CategoryList.as_view(), name="categories",),
     path("categories/<str:pk>", CategoryDetail.as_view(), name="category",),
     path("sell/services", ServicesList.as_view(), name="services",),
+    path("sell/orders", ServiceOrdersList.as_view(), name="service orders",),
     path("sell/services/<str:pk>", ServicesDetail.as_view(), name="service",),
     path(
         "parameter-template",
@@ -35,10 +37,6 @@ urlpatterns = [
         ParameterTemplateDetail.as_view(),
         name="parameter_template",
     ),
-    path("data-format", DataFormatList.as_view(), name="data_formats",),
-    path(
-        "data-format/<str:pk>", DataFormatDetail.as_view(), name="data_format",
-    ),
     path(
         "parameter-option",
         ParameterOptionList.as_view(),
@@ -48,6 +46,10 @@ urlpatterns = [
         "parameter-option/<str:pk>",
         ParameterOptionDetail.as_view(),
         name="parameter_option",
+    ),
+    path("data-format", DataFormatList.as_view(), name="data_formats",),
+    path(
+        "data-format/<str:pk>", DataFormatDetail.as_view(), name="data_format",
     ),
     path("output-file", OutputFileList.as_view(), name="output_files",),
     path(

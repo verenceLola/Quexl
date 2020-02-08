@@ -13,7 +13,7 @@ def test_list_categories(client, generate_access_token1, create_service):
     resp = json.loads(response.content.decode())
     assert response.status_code == 200
     assert resp["status"] == "success"
-    assert resp["data"][0]["name"] == "Service 1"
+    assert resp["data"][0]["name"] == "Online file conversion"
 
 
 def test_get_a_service(client, generate_access_token1, create_service):
@@ -26,7 +26,7 @@ def test_get_a_service(client, generate_access_token1, create_service):
     resp = json.loads(response.content.decode())
     assert response.status_code == 200
     assert resp["status"] == "success"
-    assert resp["data"]["name"] == "Service 1"
+    assert resp["data"]["name"] == "Online file conversion"
 
 
 def test_get_a_services_with_errors(
