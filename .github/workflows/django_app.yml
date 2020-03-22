@@ -3,25 +3,32 @@ name: Django application
 on: [push, pull_request]
 
 jobs:
-  build:
-
+  container-job:
     runs-on: ubuntu-latest
+    
+    container:
+      image:  python:3.8
+
+    services:
+      postgres:
+        image: postgres:12.1
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: postgres
+        ports:
+        - 5432:5432
+
+        options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
+      
+      redis:
+        image: redis
+        ports:
+          - 6379:6379
+        options: --entrypoint redis-server
 
     steps:
     - uses: actions/checkout@v1
-    - name: Set up Python 3.7
-      uses: actions/setup-python@v1
-      with:
-        python-version: 3.7
-    - name: Setup PostgreSQL
-      uses: Harmon758/postgresql-action@v1.0.0
-      with:
-        postgresql user:
-          'postgres'
-    - name: Setup Redis 5
-      uses: shogo82148/actions-setup-redis@v1
-      with:
-        redis-version: '5.x'
     - name: Install dependencies
       run: |
         # install libv to prevent psycopg2 build errors
@@ -41,6 +48,7 @@ jobs:
         SECRET_KEY: ${{ secrets.SECRET_KEY }}
         DATABASE_URL: ${{ secrets.DATABASE_URL }}
       run: |
+        # psql -U postgres -h postgres
         pytest
     - name: Upload coverage to Codecov  
       uses: codecov/codecov-action@v1.0.2
