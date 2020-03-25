@@ -177,17 +177,20 @@ class HistoryDetail(RetrieveUpdateDestroyAPIViewWrapper):
         )
 
 
-async def check_status(queryset):
+async def check_status(queryset): # pragma: no cover
     api_key = environ.Env().read_env()
     api_key = os.environ["EXTERNAL_API_KEY"]
     uri = "https://sandbox.zamzar.com/v1/jobs/{}".format(queryset.job_id)
     response = requests.get(uri, auth=HTTPBasicAuth(api_key, ""))
-    if response.json()["status"] == "successful":
-        data = {"status": "COMPLETED"}
-        serializer = OrderSerializer(queryset, data=data, partial=True)
-        if serializer.is_valid(raise_exception=True):
-            serializer.save()
-    return response
+    try:
+        if response.json()["status"] == "successful":
+            data = {"status": "COMPLETED"}
+            serializer = OrderSerializer(queryset, data=data, partial=True)
+            if serializer.is_valid(raise_exception=True):
+                serializer.save()
+        return response
+    except BaseException:
+        raise NotFound("Resource not found")
 
 
 class RefreshOrder(RetrieveAPIView):
