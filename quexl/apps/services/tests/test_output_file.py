@@ -8,7 +8,7 @@ def test_list_output_file(client, generate_access_token1, create_output_file):
     test listing output_file
     """
     URL = reverse("services:output_files")
-    token, user = generate_access_token1
+    token, _ = generate_access_token1
     response = client.get(URL, HTTP_AUTHORIZATION=f"Bearer {token}")
     resp = json.loads(response.content.decode())
     assert response.status_code == 200
@@ -23,7 +23,7 @@ def test_get_an_output_file(
     test geting one output_file
     """
     URL = reverse("services:output_file", args=[create_output_file.id])
-    token, user = generate_access_token1
+    token, _ = generate_access_token1
     response = client.get(URL, HTTP_AUTHORIZATION=f"Bearer {token}")
     resp = json.loads(response.content.decode())
     assert response.status_code == 200
@@ -35,7 +35,7 @@ def test_create_output_file_with_erros(client, generate_access_token1):
     """
     test getting a output file with errors
     """
-    token, user = generate_access_token1
+    token, _ = generate_access_token1
     URL = reverse("services:output_files")
     data = {
         "name": "file",

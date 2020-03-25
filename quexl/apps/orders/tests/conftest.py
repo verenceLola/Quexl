@@ -1,9 +1,11 @@
 # config tests file
 import os
+import json
 
 import pytest
 from django.core.files import File
 
+from django.urls import reverse
 # models
 from quexl.apps.orders.models import DataFile
 from quexl.apps.orders.models import History
@@ -44,9 +46,9 @@ def create_parameter(create_parameter_template):
 def create_history_element(create_data_file):
     """create an order instance"""
     hist = History()
-    hist.set(data_file=create_data_file)
     hist.output_url = "https://sandbox.zamzar.com/v1/jobs/id"
     hist.save()
+    hist.data_file.add(create_data_file)
     return hist
 
 
@@ -63,10 +65,11 @@ def create_order(
     order.service = create_service
     order.parameter = create_parameter
     order.data_file = create_data_file
-    order.history = create_data_file
+    order.history = create_history_element
     order.status = "PROCESSING"
     order.price.amount = "5"
     order.price.currency = "usd"
     order.buyer = create_db_user
+    order.end_date = "2029-02-26T16:59:51.533435Z"
     order.save()
     return order
