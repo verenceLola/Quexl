@@ -63,6 +63,7 @@ packaging==19.2
 pathspec==0.7.0
 pep8==1.7.1
 phonenumbers==8.10.20
+Pillow==7.0.0
 pluggy==0.13.0
 pre-commit==1.18.3
 psycopg2==2.8.3
@@ -75,6 +76,7 @@ pycparser==2.19
 pyflakes==2.1.1
 PyHamcrest==1.9.0
 PyJWT==1.7.1
+pylint==2.4.4
 pyOpenSSL==19.1.0
 pyparsing==2.4.2
 pytest==5.2.1
