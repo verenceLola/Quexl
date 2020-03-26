@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     "quexl.apps.messaging",
     "quexl.apps.services",
     "quexl.apps.orders",
+    "quexl.apps.contact",
     # external apps
     "phonenumber_field",
     "social_django",
