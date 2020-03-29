@@ -1,10 +1,11 @@
-from django.urls import path, re_path
+from django.urls import path
+from django.urls import re_path
+
+from quexl.apps.messaging.views import ListCreateGroupAPIiew
+from quexl.apps.messaging.views import ListDMMessagesAPIView
+from quexl.apps.messaging.views import ListGroupMessages
+
 from . import consumers
-from quexl.apps.messaging.views import (
-    ListDMMessagesAPIView,
-    ListCreateGroupAPIiew,
-    ListGroupMessages,
-)
 
 app_name = "messaging"
 

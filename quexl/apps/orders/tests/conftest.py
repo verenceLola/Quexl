@@ -1,11 +1,9 @@
 # config tests file
 import os
-import json
 
 import pytest
 from django.core.files import File
 
-from django.urls import reverse
 # models
 from quexl.apps.orders.models import DataFile
 from quexl.apps.orders.models import History

@@ -1,5 +1,8 @@
-from django.urls import resolve, reverse
-from quexl.apps.roles.views import UserRoleAPIView, PermissionsAPIView
+from django.urls import resolve
+from django.urls import reverse
+
+from quexl.apps.roles.views import PermissionsAPIView
+from quexl.apps.roles.views import UserRoleAPIView
 
 
 def test_user_roles_url_resolves():
