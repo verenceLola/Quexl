@@ -1,7 +1,9 @@
 """
 test profiles urls
 """
-from django.urls import resolve, reverse
+from django.urls import resolve
+from django.urls import reverse
+
 from quexl.apps.profiles.views import ProfileGenericAPIView
 
 

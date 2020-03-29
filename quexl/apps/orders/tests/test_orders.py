@@ -2,7 +2,6 @@
 test file for orders
 """
 import json
-import pytest
 
 from django.urls import reverse
 
@@ -21,7 +20,7 @@ def test_refresh_order(client, generate_access_token1, create_order):
     """test refreshing of an order"""
     url = reverse("order:refresh order", args=[create_order.id])
     token, _ = generate_access_token1
-    response = client.get(url, HTTP_AUTHORIZATION=F'Bearer {token}')
+    response = client.get(url, HTTP_AUTHORIZATION=f"Bearer {token}")
     resp = json.loads(response.content.decode())
     assert response.status_code == 404
     assert resp["status"] == "error"

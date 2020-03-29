@@ -177,7 +177,7 @@ class HistoryDetail(RetrieveUpdateDestroyAPIViewWrapper):
         )
 
 
-async def check_status(queryset): # pragma: no cover
+async def check_status(queryset):  # pragma: no cover
     api_key = environ.Env().read_env()
     api_key = os.environ["EXTERNAL_API_KEY"]
     uri = "https://sandbox.zamzar.com/v1/jobs/{}".format(queryset.job_id)

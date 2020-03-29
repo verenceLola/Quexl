@@ -1,4 +1,5 @@
-from django.urls import resolve, reverse
+from django.urls import resolve
+from django.urls import reverse
 
 import quexl.apps.account.views as views
 

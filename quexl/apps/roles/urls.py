@@ -1,6 +1,7 @@
 from django.urls import path
-from quexl.apps.roles.views import UserRoleAPIView, PermissionsAPIView
 
+from quexl.apps.roles.views import PermissionsAPIView
+from quexl.apps.roles.views import UserRoleAPIView
 
 app_name = "roles"
 

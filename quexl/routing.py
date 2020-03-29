@@ -1,8 +1,9 @@
-import quexl.apps.messaging.routing
-from channels.routing import ProtocolTypeRouter, URLRouter
-from quexl.apps.messaging.middlewares import JWTAuthMiddlewareStack
+from channels.routing import ProtocolTypeRouter
+from channels.routing import URLRouter
 from channels.security.websocket import AllowedHostsOriginValidator
 
+import quexl.apps.messaging.routing
+from quexl.apps.messaging.middlewares import JWTAuthMiddlewareStack
 
 application = ProtocolTypeRouter(
     {

@@ -1,4 +1,5 @@
 from django.urls import path
+
 from quexl.apps.profiles.views import ProfileGenericAPIView
 
 app_name = "profiles"
