@@ -1,21 +1,23 @@
-from django.shortcuts import render
-from .models import Contact
-from .serializers import ContactSerializer
-from rest_framework.permissions import IsAuthenticated
 from rest_framework import response
 from rest_framework import status
+from rest_framework.generics import ListCreateAPIView
+from rest_framework.generics import RetrieveDestroyAPIView
+from rest_framework.permissions import IsAuthenticated
 
 from quexl.utils.renderers import DefaultRenderer
 
-from rest_framework.generics import RetrieveDestroyAPIView, ListCreateAPIView, RetrieveUpdateDestroyAPIView
+from .models import Contact
+from .serializers import ContactSerializer
+
 
 class ContactList(ListCreateAPIView):
     """
     services view for listing and creating contact
     """
+
     name = "contact"
     pluralized_name = "contacts"
-    # permission_classes = (IsAuthenticated,)
+    # permission_classes = (IsAuthenticated,) #TODO
     queryset = Contact.objects.all()
     serializer_class = ContactSerializer
     renderer_classes = (DefaultRenderer,)
@@ -25,11 +27,13 @@ class ContactList(ListCreateAPIView):
         self.operation = "Create contact "
         return super(ListCreateAPIView, self).create(request, **kwargs)
 
+
 class ContactDetail(RetrieveDestroyAPIView):
     """view for retrieving and destroying a contact"""
+
     name = "contact"
     pluralized_name = "contacts"
-    permission_classes = (IsAuthenticated, )
+    permission_classes = (IsAuthenticated,)
     queryset = Contact.objects.all()
     serializer_class = ContactSerializer
     renderer_classes = (DefaultRenderer,)

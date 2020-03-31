@@ -7,36 +7,23 @@ import os
 import environ
 import requests
 from requests.auth import HTTPBasicAuth
-from rest_framework import response
-from rest_framework import status
 from rest_framework.exceptions import NotFound
 from rest_framework.generics import ListAPIView
 from rest_framework.generics import ListCreateAPIView
 from rest_framework.generics import RetrieveAPIView
-from rest_framework.generics import RetrieveUpdateDestroyAPIView
 from rest_framework.permissions import IsAuthenticated
 
 from quexl.apps.orders.models import DataFile
 from quexl.apps.orders.models import History
 from quexl.apps.orders.models import Order
 from quexl.apps.orders.models import Parameter
-from quexl.apps.orders.renders import OrdersRenderer
 from quexl.apps.orders.serializers import DataFileSerializer
 from quexl.apps.orders.serializers import HistorySerializer
 from quexl.apps.orders.serializers import OrderSerializer
 from quexl.apps.orders.serializers import ParameterSerializer
+from quexl.helpers.model_wrapper import RetrieveUpdateDestroyAPIViewWrapper
 from quexl.helpers.permissions import IsBuyerOrReadOnly
-
-
-class RetrieveUpdateDestroyAPIViewWrapper(RetrieveUpdateDestroyAPIView):
-    """prevent updating using a PUT method"""
-
-    def put(self, request, **kwargs):
-        """Update method"""
-        return response.Response(
-            {"message": "To update %s, use PATCH method" % self.name},
-            status=status.HTTP_405_METHOD_NOT_ALLOWED,
-        )
+from quexl.utils.renderers import DefaultRenderer
 
 
 class ParameterList(ListCreateAPIView):
@@ -49,7 +36,7 @@ class ParameterList(ListCreateAPIView):
     permission_classes = (IsAuthenticated,)
     queryset = Parameter.objects.all()
     serializer_class = ParameterSerializer
-    renderer_classes = (OrdersRenderer,)
+    renderer_classes = (DefaultRenderer,)
 
     def create(self, request, **kwargs):
         """overide creating of parameter """
@@ -65,7 +52,7 @@ class ParameterDetail(RetrieveUpdateDestroyAPIViewWrapper):
     permission_classes = (IsAuthenticated,)
     queryset = Parameter.objects.all()
     serializer_class = ParameterSerializer
-    renderer_classes = (OrdersRenderer,)
+    renderer_classes = (DefaultRenderer,)
     name = "parameter"
     pluralized_name = "parameters"
 
@@ -77,7 +64,7 @@ class DataFileList(ListCreateAPIView):
     pluralized_name = "data files"
     permission_classes = (IsAuthenticated,)
     queryset = DataFile.objects.all()
-    renderer_classes = (OrdersRenderer,)
+    renderer_classes = (DefaultRenderer,)
     serializer_class = DataFileSerializer
 
     def create(self, request, **kwargs):
@@ -94,7 +81,7 @@ class DataFileDetail(RetrieveUpdateDestroyAPIViewWrapper):
     permission_class = (IsAuthenticated,)
     queryset = DataFile.objects.all()
     serializer_class = DataFileSerializer
-    renderer_classes = (OrdersRenderer,)
+    renderer_classes = (DefaultRenderer,)
 
     def update(self, request, *args, **kwargs):
         """overide the update method"""
@@ -110,7 +97,7 @@ class OrderList(ListCreateAPIView):
     name = "order"
     pluralized_name = "orders"
     permission_classes = (IsAuthenticated, IsBuyerOrReadOnly)
-    renderer_classes = (OrdersRenderer,)
+    renderer_classes = (DefaultRenderer,)
     serializer_class = OrderSerializer
 
     def create(self, request, **kwargs):
@@ -141,7 +128,7 @@ class OrderDetail(RetrieveUpdateDestroyAPIViewWrapper):
     permission_classes = (IsAuthenticated, IsBuyerOrReadOnly)
     queryset = Order.objects.all()
     serializer_class = OrderSerializer
-    renderer_classes = (OrdersRenderer,)
+    renderer_classes = (DefaultRenderer,)
 
     def update(self, request, *args, **kwargs):
         self.operation = "update order"
@@ -156,7 +143,7 @@ class HistoryList(ListAPIView):
     pluralized_name = "histories"
     permission_classes = (IsAuthenticated,)
     queryset = History.objects.all()
-    renderer_classes = (OrdersRenderer,)
+    renderer_classes = (DefaultRenderer,)
     serializer_class = HistorySerializer
 
 
@@ -168,7 +155,7 @@ class HistoryDetail(RetrieveUpdateDestroyAPIViewWrapper):
     permission_classes = (IsAuthenticated,)
     queryset = History.objects.all()
     serializer_class = HistorySerializer
-    renderer_classes = (OrdersRenderer,)
+    renderer_classes = (DefaultRenderer,)
 
     def update(self, request, *args, **kwargs):
         self.operation = "update history"
@@ -200,7 +187,7 @@ class RefreshOrder(RetrieveAPIView):
     permission_classes = (IsAuthenticated, IsBuyerOrReadOnly)
     queryset = Order.objects.all()
     serializer_class = OrderSerializer
-    renderer_classes = (OrdersRenderer,)
+    renderer_classes = (DefaultRenderer,)
 
     def retrieve(self, request, *args, **kwargs):  # pragma: no cover
         self.operation = "update order"
@@ -220,7 +207,7 @@ class DownloadOrder(RetrieveAPIView):
     permission_classes = (IsAuthenticated, IsBuyerOrReadOnly)
     queryset = Order.objects.all()
     serializer_class = OrderSerializer
-    renderer_classes = (OrdersRenderer,)
+    renderer_classes = (DefaultRenderer,)
 
     def retrieve(self, request, *args, **kwargs):  # pragma: no cover
         self.operation = "download order"
