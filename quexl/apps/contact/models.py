@@ -1,5 +1,7 @@
 from django.db import models
+
 from quexl.helpers.fancy_generator import fancy_id_generator
+
 
 class Contact(models.Model):
     """

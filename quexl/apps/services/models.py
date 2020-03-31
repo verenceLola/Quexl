@@ -66,6 +66,20 @@ class DataFormat(models.Model):
     description = models.CharField(max_length=300, blank=True)
 
 
+class Gallery(models.Model):
+    """Gallery model"""
+
+    id = models.CharField(
+        db_index=True,
+        max_length=256,
+        default=fancy_id_generator,
+        primary_key=True,
+        editable=False,
+    )
+    image = models.ImageField(upload_to="images/")
+    description = models.CharField(max_length=200, blank=True)
+
+
 class Service(models.Model):
     """
     services model
@@ -86,6 +100,9 @@ class Service(models.Model):
         max_digits=19, decimal_places=4, default=0.0000, default_currency="USD"
     )
     delivery_time = models.DateTimeField()
+    gallery = models.ForeignKey(
+        Gallery, on_delete=models.CASCADE, blank=True, null=True
+    )
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     category = TreeForeignKey(
@@ -94,21 +111,6 @@ class Service(models.Model):
     is_published = models.BooleanField(default=False)
     sub_category = models.CharField(max_length=150, blank=True)
     long_description = models.TextField(blank=True)
-
-
-class Gallery(models.Model):
-    """Gallery model"""
-
-    id = models.CharField(
-        db_index=True,
-        max_length=256,
-        default=fancy_id_generator,
-        primary_key=True,
-        editable=False,
-    )
-    service = models.ForeignKey(Service, on_delete=models.CASCADE)
-    image = models.ImageField(upload_to="images/")
-    description = models.CharField(max_length=200)
 
 
 class OutputFile(models.Model):

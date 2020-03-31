@@ -15,4 +15,5 @@ urlpatterns = [
     path("api/", include("quexl.apps.services.urls")),
     path("api/", include("quexl.apps.orders.urls")),
     path("api/", include("quexl.apps.contact.urls")),
+    path("api/", include("quexl.apps.blog.urls")),
 ]

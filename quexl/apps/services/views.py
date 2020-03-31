@@ -1,11 +1,8 @@
 """
 services views
 """
-from rest_framework import response
-from rest_framework import status
 from rest_framework.generics import ListAPIView
 from rest_framework.generics import ListCreateAPIView
-from rest_framework.generics import RetrieveUpdateDestroyAPIView
 from rest_framework.permissions import IsAuthenticated
 
 from quexl.apps.orders.models import Order
@@ -17,7 +14,6 @@ from quexl.apps.services.models import OutputFile
 from quexl.apps.services.models import ParameterOption
 from quexl.apps.services.models import ParameterTemplate
 from quexl.apps.services.models import Service
-from quexl.apps.services.renderers import ServicesRenderer
 from quexl.apps.services.serializers import CategorySerializer
 from quexl.apps.services.serializers import DataFormatSerializer
 from quexl.apps.services.serializers import GallerySerializer
@@ -25,30 +21,9 @@ from quexl.apps.services.serializers import OutputFileSerializer
 from quexl.apps.services.serializers import ParameterOptionSerializer
 from quexl.apps.services.serializers import ParameterTemplateSerializer
 from quexl.apps.services.serializers import ServicesSerializer
+from quexl.helpers.model_wrapper import RetrieveUpdateDestroyAPIViewWrapper
 from quexl.helpers.permissions import IsSellerOrReadOnly
-
-
-class RetrieveUpdateDestroyAPIViewWrapper(RetrieveUpdateDestroyAPIView):
-    """
-    prevent updating using PUT, define delete()
-    """
-
-    def put(self, request, **kwargs):
-        """
-        update object
-        """
-        return response.Response(
-            {"message": "To update %s, use PATCH method" % self.name},
-            status=status.HTTP_405_METHOD_NOT_ALLOWED,
-        )
-
-    def delete(self, request, **kwargs):
-        """
-        delete category with all of its sub-categories
-        """
-        obj = self.get_object()
-        obj.delete()
-        return response.Response({}, status=status.HTTP_200_OK)
+from quexl.utils.renderers import DefaultRenderer
 
 
 class CategoryList(ListCreateAPIView):
@@ -61,7 +36,7 @@ class CategoryList(ListCreateAPIView):
     permission_classes = (IsAuthenticated,)
     queryset = Category.objects.filter(level=0)  # get root nodes
     serializer_class = CategorySerializer
-    renderer_classes = (ServicesRenderer,)
+    renderer_classes = (DefaultRenderer,)
 
     def create(self, request, **kwargs):
         """overide creating of category"""
@@ -79,7 +54,7 @@ class CategoryDetail(RetrieveUpdateDestroyAPIViewWrapper):
     permission_classes = (IsAuthenticated,)
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
-    renderer_classes = (ServicesRenderer,)
+    renderer_classes = (DefaultRenderer,)
 
     def update(self, request, *args, **kwargs):
         self.operation = "category"
@@ -97,7 +72,7 @@ class ServicesList(ListCreateAPIView):
     pluralized_name = "services"
     permission_classes = (IsSellerOrReadOnly, IsAuthenticated)
     queryset = Service.objects.all()
-    renderer_classes = (ServicesRenderer,)
+    renderer_classes = (DefaultRenderer,)
     serializer_class = ServicesSerializer
 
     def create(self, request, **kwargs):
@@ -114,7 +89,7 @@ class ServicesDetail(RetrieveUpdateDestroyAPIViewWrapper):
     permission_classes = (IsSellerOrReadOnly, IsAuthenticated)
     queryset = Service.objects.all()
     serializer_class = ServicesSerializer
-    renderer_classes = (ServicesRenderer,)
+    renderer_classes = (DefaultRenderer,)
     name = "service"
     pluralized_name = "services"
 
@@ -131,7 +106,7 @@ class ServiceOrdersList(ListAPIView):
     name = "seller order"
     pluralized_name = "seller orders"
     permission_classes = (IsAuthenticated, IsSellerOrReadOnly)
-    renderer_classes = (ServicesRenderer,)
+    renderer_classes = (DefaultRenderer,)
     serializer_class = OrderSerializer
 
     def get_queryset(self):
@@ -151,7 +126,7 @@ class DataFormatList(ListCreateAPIView):
     pluralized_name = "data_formats"
     permission_classes = (IsAuthenticated,)
     queryset = DataFormat.objects.all()
-    renderer_classes = (ServicesRenderer,)
+    renderer_classes = (DefaultRenderer,)
     serializer_class = DataFormatSerializer
 
 
@@ -163,7 +138,7 @@ class DataFormatDetail(RetrieveUpdateDestroyAPIViewWrapper):
     permission_classes = (IsAuthenticated,)
     queryset = DataFormat.objects.all()
     serializer_class = DataFormatSerializer
-    renderer_classes = (ServicesRenderer,)
+    renderer_classes = (DefaultRenderer,)
     name = "data format"
     pluralized_name = "data formats"
 
@@ -177,7 +152,7 @@ class ParameterTemplateList(ListCreateAPIView):
     pluralized_name = "parameter_templates"
     permission_classes = (IsAuthenticated,)
     queryset = ParameterTemplate.objects.all()
-    renderer_classes = (ServicesRenderer,)
+    renderer_classes = (DefaultRenderer,)
     serializer_class = ParameterTemplateSerializer
 
     def create(self, request, **kwargs):
@@ -194,7 +169,7 @@ class ParameterTemplateDetail(RetrieveUpdateDestroyAPIViewWrapper):
     permission_classes = (IsAuthenticated,)
     queryset = ParameterTemplate.objects.all()
     serializer_class = ParameterTemplateSerializer
-    renderer_classes = (ServicesRenderer,)
+    renderer_classes = (DefaultRenderer,)
     name = "parameter template"
     pluralized_name = "parameter templates"
 
@@ -209,7 +184,7 @@ class ParameterOptionList(ListCreateAPIView):
     permission_classes = (IsAuthenticated,)
     queryset = ParameterOption.objects.all()
     serializer_class = ParameterOptionSerializer
-    renderer_classes = (ServicesRenderer,)
+    renderer_classes = (DefaultRenderer,)
 
     def create(self, request, **kwargs):
         """overide creating of parameter option"""
@@ -225,7 +200,7 @@ class ParameterOptionDetail(RetrieveUpdateDestroyAPIViewWrapper):
     permission_classes = (IsAuthenticated,)
     queryset = ParameterOption.objects.all()
     serializer_class = ParameterOptionSerializer
-    renderer_classes = (ServicesRenderer,)
+    renderer_classes = (DefaultRenderer,)
     name = "parameter option"
     pluralized_name = "parameter options"
 
@@ -240,7 +215,7 @@ class OutputFileList(ListCreateAPIView):
     permission_classes = (IsAuthenticated,)
     queryset = OutputFile.objects.all()
     serializer_class = OutputFileSerializer
-    renderer_classes = (ServicesRenderer,)
+    renderer_classes = (DefaultRenderer,)
 
     def create(self, request, **kwargs):
         """overide creating of output file"""
@@ -256,7 +231,7 @@ class OutputFileDetail(RetrieveUpdateDestroyAPIViewWrapper):
     permission_classes = (IsAuthenticated,)
     queryset = OutputFile.objects.all()
     serializer_class = OutputFileSerializer
-    renderer_classes = (ServicesRenderer,)
+    renderer_classes = (DefaultRenderer,)
     name = "output file"
     pluralized_name = "output files"
 
@@ -271,7 +246,7 @@ class GalleryList(ListCreateAPIView):
     permission_classes = (IsSellerOrReadOnly, IsAuthenticated)
     queryset = Gallery.objects.all()
     serializer_class = GallerySerializer
-    renderer_classes = (ServicesRenderer,)
+    renderer_classes = (DefaultRenderer,)
 
     def create(self, request, **kwargs):
         """overide creating of gallery"""
@@ -287,7 +262,7 @@ class GalleryDetail(RetrieveUpdateDestroyAPIViewWrapper):
     permission_classes = (IsAuthenticated,)
     queryset = Gallery.objects.all()
     serializer_class = GallerySerializer
-    renderer_classes = (ServicesRenderer,)
+    renderer_classes = (DefaultRenderer,)
     name = "gallery"
     pluralized_name = "galleries"
 
