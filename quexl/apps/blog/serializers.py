@@ -11,81 +11,6 @@ from quexl.apps.blog.models import Dislike
 from quexl.apps.blog.models import Like
 
 
-class BlogSerializer(serializers.ModelSerializer):
-    """
-    serializer for the blog model
-    """
-
-    class Meta:
-        model = Blog
-        fields = "__all__"
-        read_only_fields = ("author", "slug", "created_at", "updated_at")
-
-    likes = serializers.SerializerMethodField()
-    dislikes = serializers.SerializerMethodField()
-
-    def get_likes(self, blog):
-        likes = Like.objects.filter(blog=blog.pk).count()
-        return likes
-
-    def get_dislikes(self, blog):
-        dislikes = Dislike.objects.filter(blog=blog.pk).count()
-        return dislikes
-
-    def create(self, validated_data):
-        """
-        create a blog with author as the current user
-        """
-        validated_data.update({"author": self.context["request"].user})
-        blog = Blog.objects.create(**validated_data)
-        return blog
-
-
-class CommentSerializer(serializers.ModelSerializer):
-    """
-    serializer for comment model
-    """
-
-    class Meta:
-        model = Comment
-        exclude = ("lft", "rght", "tree_id", "level")
-        read_only_fields = ("parent", "user")
-
-    parent_id = serializers.CharField(required=False, write_only=True)
-    replies = serializers.SerializerMethodField()
-
-    def get_replies(self, parent):
-        queryset = parent.get_children()
-        serializer = CommentSerializer(
-            queryset, many=True, context=self.context
-        )
-        return serializer.data
-
-    def create(self, validated_data):
-        """
-        create new category instance
-        """
-        validated_data.update({"user": self.context["request"].user})
-        return Comment.objects.create(**validated_data)
-
-    def update(self, instance, validated_data):
-        """
-        update Comment details
-        """
-        for (key, value) in validated_data.items():
-            setattr(instance, key, value)
-        try:
-            instance.save()
-        except InvalidMove:
-            raise ValidationError(
-                {
-                    "name": "A Comment cannot be a \
-                        sub-comment of one of its sub-subcomments"
-                }
-            )
-        return instance
-
-
 class LikeSerializer(serializers.ModelSerializer):
     """
     serializer for the like model
@@ -134,3 +59,90 @@ class DislikeSerializer(serializers.ModelSerializer):
             dislike = dislike.filter(user=self.context["request"].user)
             dislike.delete()
             raise NotFound("Dislike not found")
+
+
+class CommentSerializer(serializers.ModelSerializer):
+    """
+    serializer for comment model
+    """
+
+    class Meta:
+        model = Comment
+        exclude = ("lft", "rght", "tree_id", "level")
+        read_only_fields = ("parent", "user")
+
+    parent_id = serializers.CharField(required=False, write_only=True)
+    replies = serializers.SerializerMethodField()
+
+    def get_replies(self, parent):
+        queryset = parent.get_children()
+        serializer = CommentSerializer(
+            queryset, many=True, context=self.context
+        )
+        return serializer.data
+
+    def create(self, validated_data):
+        """
+        create new category instance
+        """
+        validated_data.update({"user": self.context["request"].user})
+        return Comment.objects.create(**validated_data)
+
+    def update(self, instance, validated_data):
+        """
+        update Comment details
+        """
+        for (key, value) in validated_data.items():
+            setattr(instance, key, value)
+        try:
+            instance.save()
+        except InvalidMove:
+            raise ValidationError(
+                {
+                    "name": "A Comment cannot be a \
+                        sub-comment of one of its sub-subcomments"
+                }
+            )
+        return instance
+
+
+class BlogSerializer(serializers.ModelSerializer):
+    """
+    serializer for the blog model
+    """
+
+    class Meta:
+        model = Blog
+        fields = "__all__"
+        read_only_fields = ("author", "slug", "created_at", "updated_at")
+
+    likes = serializers.SerializerMethodField()
+    dislikes = serializers.SerializerMethodField()
+    comments = serializers.SerializerMethodField()
+
+    def get_likes(self, blog):
+        queryset = Like.objects.filter(blog=blog.pk)
+        serializer = LikeSerializer(queryset, many=True, context=self.context)
+        return serializer.data
+
+    def get_dislikes(self, blog):
+        queryset = Dislike.objects.filter(blog=blog.pk)
+        serializer = DislikeSerializer(
+            queryset, many=True, context=self.context
+        )
+        return serializer.data
+
+    def get_comments(self, blog):
+        queryset = Comment.objects.filter(blog=blog.pk)
+        serializer = CommentSerializer(
+            queryset, many=True, context=self.context
+        )
+        return serializer.data
+
+    def create(self, validated_data):
+        """
+        create a blog with author as the current user
+        """
+        validated_data.update({"author": self.context["request"].user})
+        blog = Blog.objects.create(**validated_data)
+        return blog
