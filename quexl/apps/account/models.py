@@ -8,11 +8,6 @@ from djmoney.models.fields import MoneyField
 
 from quexl.helpers.fancy_generator import fancy_id_generator
 
-USER_TYPES = [
-    ("buyer", "Buyer"),
-    ("seller", "Seller"),
-]
-
 
 class UserManager(BaseUserManager):
     def create_user(
@@ -81,9 +76,6 @@ class User(AbstractBaseUser, PermissionsMixin):
     )  # TODO implement as required
     is_staff = models.BooleanField(default=False)
     updated_at = models.DateTimeField(auto_now=True)
-    user_type = models.CharField(
-        max_length=10, choices=USER_TYPES, default="buyer"
-    )
     balance = MoneyField(
         max_digits=19, decimal_places=4, default=0.0000, default_currency="USD"
     )
