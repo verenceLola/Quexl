@@ -13,6 +13,8 @@ from quexl.apps.orders.models import Order
 from quexl.apps.orders.models import Parameter
 from quexl.apps.services.serializers import PriceSerializerWrapper
 
+# import stripe
+
 
 class ParameterSerializer(serializers.ModelSerializer):
     """
@@ -43,7 +45,7 @@ class OrderSerializer(PriceSerializerWrapper):
         validated_data.update({"buyer": self.context["request"].user})
 
         async def request_order():
-            api_key = os.environ["EXTERNAL_API_KEY"]
+            api_key = os.environ.get("EXTERNAL_API_KEY")
             endpoint = validated_data["service"].api_endpoint
             source_file = validated_data["data_file"].data_file_upload
             target_format = validated_data[
@@ -80,6 +82,17 @@ class OrderSerializer(PriceSerializerWrapper):
             return order
 
         order = asyncio.run(main())
+        # import pdb; pdb.set_trace()
+        # # payment
+        # stripe.api_key = os.environ.get('STRIPE_SECRET_KEY')
+
+        # intent = stripe.PaymentIntent.create(
+        # amount=1099,
+        # currency='usd',
+        # # Verify your integration in this guide by including this parameter
+        # metadata={'integration_check': 'accept_a_payment'},
+        # )
+        # import pdb; pdb.set_trace()
         return order
 
 

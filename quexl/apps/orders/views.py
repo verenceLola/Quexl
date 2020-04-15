@@ -166,7 +166,7 @@ class HistoryDetail(RetrieveUpdateDestroyAPIViewWrapper):
 
 async def check_status(queryset):  # pragma: no cover
     api_key = environ.Env().read_env()
-    api_key = os.environ["EXTERNAL_API_KEY"]
+    api_key = os.environ.get("EXTERNAL_API_KEY")
     uri = "https://sandbox.zamzar.com/v1/jobs/{}".format(queryset.job_id)
     response = requests.get(uri, auth=HTTPBasicAuth(api_key, ""))
     try:
@@ -216,7 +216,7 @@ class DownloadOrder(RetrieveAPIView):
         async def download_order(res):
             file_name = res.json()["target_files"][0]["name"]
             file_id = res.json()["target_files"][0]["id"]
-            api_key = os.environ["EXTERNAL_API_KEY"]
+            api_key = os.environ.get("EXTERNAL_API_KEY")
             endpoint = "https://sandbox.zamzar.com/v1/files/{}/content".format(
                 file_id
             )

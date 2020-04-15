@@ -101,6 +101,18 @@ SECRET_KEY = env.str("SECRET_KEY", "#gy%@@^ySGT@^")
 
 DATABASES = {"default": env.db()}
 
+if os.environ.get("GITHUB_WORKFLOW"):
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.postgresql",
+            "NAME": "github_actions",
+            "USER": "postgres",
+            "PASSWORD": "postgres",
+            "HOST": "127.0.0.1",
+            "PORT": "5432",
+        }
+    }
+
 # configure Django Channels
 REDIS_URL = env.str("REDIS_URL", "redis://localhost:6379")
 

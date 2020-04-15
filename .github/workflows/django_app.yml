@@ -7,17 +7,25 @@ jobs:
 
     runs-on: ubuntu-latest
 
+    services:
+      postgres:
+        image: postgres:12.2
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: quexl
+        ports:
+          - 5432:5432
+        options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
+
     steps:
     - uses: actions/checkout@v1
     - name: Set up Python 3.7
       uses: actions/setup-python@v1
       with:
         python-version: 3.7
-    - name: Setup PostgreSQL
-      uses: Harmon758/postgresql-action@v1.0.0
-      with:
-        postgresql user:
-          'postgres'
+    - name: psycopg2 prerequisites
+      run: sudo apt-get install python-dev libpq-dev
     - name: Setup Redis 5
       uses: shogo82148/actions-setup-redis@v1
       with:
@@ -38,10 +46,10 @@ jobs:
         flake8 . --count --max-complexity=10 --max-line-length=127 --statistics
     - name: Test with pytest
       env:
+        EXTERNAL_API_KEY: ${{ secrets.EXTERNAL_API_KEY }}
         SECRET_KEY: ${{ secrets.SECRET_KEY }}
         DATABASE_URL: ${{ secrets.DATABASE_URL }}
-      run: |
-        pytest
+      run: pytest
     - name: Upload coverage to Codecov  
       uses: codecov/codecov-action@v1.0.2
       with:
