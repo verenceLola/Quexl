@@ -22,9 +22,17 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # See https://docs.djangoproject.com/en/2.2/howto/deployment/checklist/
 
 
-ALLOWED_HOSTS = ["*"]  # TODO Add list of allowed hosts
-CORS_ORIGIN_ALLOW_ALL = True  # TODO Change to False
+ALLOWED_HOSTS = [
+    "*",
+    "http://localhost:4200",
+]  # TODO Add list of allowed hosts
+# CORS_ORIGIN_ALLOW_ALL = True  # TODO Change to False
 # Application definition
+
+# Application definition
+CORS_ORIGIN_WHITELIST = [
+    "http://localhost:4200",
+]
 
 INSTALLED_APPS = [
     "django.contrib.admin",
@@ -35,6 +43,7 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "rest_framework",
     "rolepermissions",
+    "corsheaders",
     # local apps
     "quexl.apps.account",
     "quexl.apps.profiles",
@@ -54,8 +63,8 @@ INSTALLED_APPS = [
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
-    "django.middleware.common.CommonMiddleware",
     "corsheaders.middleware.CorsMiddleware",
+    "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
@@ -100,6 +109,18 @@ TEMPLATE_DEBUG = DEBUG
 SECRET_KEY = env.str("SECRET_KEY", "#gy%@@^ySGT@^")
 
 DATABASES = {"default": env.db()}
+
+if os.environ.get("GITHUB_WORKFLOW"):
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.postgresql",
+            "NAME": "github_actions",
+            "USER": "postgres",
+            "PASSWORD": "postgres",
+            "HOST": "127.0.0.1",
+            "PORT": "5432",
+        }
+    }
 
 # configure Django Channels
 REDIS_URL = env.str("REDIS_URL", "redis://localhost:6379")
