@@ -37,6 +37,7 @@ class LoginAPIView(GenericAPIView):
             "username": user.username,
         }
         token = JWTAuthentication.generate_token(userdata=userdata)
+        username = user.username
         # update user last login
         user.last_login = now()
         user.save()
@@ -44,7 +45,7 @@ class LoginAPIView(GenericAPIView):
         return Response(
             {
                 "message": "You have successfully logged in",
-                "meta": {"token": token},
+                "meta": {"token": token, "username": username},
             },
             status=status.HTTP_200_OK,
         )

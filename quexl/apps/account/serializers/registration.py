@@ -49,6 +49,7 @@ class RegistrationSerializer(serializers.ModelSerializer):
     password = serializers.RegexField(
         regex=r"^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{7,}$",
         max_length=128,
+        min_length=7,
         write_only=True,
         error_messages={
             "required": "Password is required",
