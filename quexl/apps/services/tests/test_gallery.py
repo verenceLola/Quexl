@@ -43,7 +43,7 @@ def test_create_gallery_with_invalid_service(client, generate_access_token1):
     data = {"image": "http://testserver/api/gallery/test_images/img.jpg"}
     data["service"] = "wrongservice"
     request = client.post(URL, data, HTTP_AUTHORIZATION=f"Bearer {token}")
-    assert request.status_code == 422
+    assert request.status_code == 400
     assert (
         request.data["message"]
         == "Create gallery failed. Fix the error(s) below"

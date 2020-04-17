@@ -34,6 +34,10 @@ class UserJSONRenderer(JSONRenderer):
         # or something similar), `data` will contain an `errors` key. We want
         # the default JSONRenderer to handle rendering errors, so we need to
         # check for this case.
+        if renderer_context["response"].status_code == 422:
+            renderer_context[
+                "response"
+            ].status_code = status.HTTP_400_BAD_REQUEST
         status_code = renderer_context["response"].status_code
 
         return (

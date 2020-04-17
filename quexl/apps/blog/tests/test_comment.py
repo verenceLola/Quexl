@@ -43,7 +43,7 @@ def test_updating_a_comment(
         content_type="application/json",
     )
     resp = json.loads(response.content.decode())
-    assert response.status_code == 422
+    assert response.status_code == 400
     assert resp["status"] == "error"
 
 

@@ -13,4 +13,4 @@ def test_create_group_without_members_field(client, generate_access_token1):
         {"group_name": "valid-group-name"},
         HTTP_AUTHORIZATION=f"Bearer {token}",
     )
-    assert response.status_code == 422
+    assert response.status_code == 400
