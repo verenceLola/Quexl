@@ -53,5 +53,5 @@ def test_create_contact_with_errors(client, generate_access_token1):
     )
     resp = json.loads(response.content.decode())
     assert resp["message"] == "Correct the errors below"
-    assert response.status_code == 422
+    assert response.status_code == 400
     assert resp["status"] == "error"

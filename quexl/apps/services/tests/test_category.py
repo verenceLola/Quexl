@@ -55,7 +55,7 @@ def test_create_category_with_errors(
     }
     data["parent_id"] = "invalid"
     request = client.post(URL, data, HTTP_AUTHORIZATION=f"Bearer {token}")
-    assert request.status_code == 422
+    assert request.status_code == 400
     assert (
         request.data["message"]
         == "create category failed. Fix the error(s) below"
@@ -73,7 +73,7 @@ def test_create_existing_category(
     data = {"name": "category_one"}
     client.post(URL, data, HTTP_AUTHORIZATION=f"Bearer {token}")
     res = client.post(URL, data, HTTP_AUTHORIZATION=f"Bearer {token}")
-    assert res.status_code == 422
+    assert res.status_code == 400
     assert (
         res.data["message"] == "create category failed. Fix the error(s) below"
     )
@@ -94,7 +94,7 @@ def test_update_with_errors(
         HTTP_AUTHORIZATION=f"Bearer {token}",
         content_type="application/json",
     )
-    assert res.status_code == 422
+    assert res.status_code == 400
     assert res.data["message"] == "category failed. Fix the error(s) below"
 
 
@@ -109,7 +109,7 @@ def test_creating_duplicate_categories(
     data = {"name": "category_one_new", "parent_id": create_category.id}
     client.post(URL, data, HTTP_AUTHORIZATION=f"Bearer {token}")
     res = client.post(URL, data, HTTP_AUTHORIZATION=f"Bearer {token}")
-    assert res.status_code == 422
+    assert res.status_code == 400
     assert (
         res.data["message"] == "create category failed. Fix the error(s) below"
     )

@@ -44,7 +44,7 @@ def test_get_a_services_with_errors(
     data["seller_id"] = "invalid"
     data["category_id"] = "invalid"
     request = client.post(URL, data, HTTP_AUTHORIZATION=f"Bearer {token}")
-    assert request.status_code == 422
+    assert request.status_code == 400
     assert (
         request.data["message"]
         == "Create service failed. Fix the error(s) below"
@@ -67,7 +67,7 @@ def test_create_service_with_bad_category(
     data["price"] = {}
     data["price"]["amount"] = "100"
     request = client.post(URL, data, HTTP_AUTHORIZATION=f"Bearer {token}")
-    assert request.status_code == 422
+    assert request.status_code == 400
     assert (
         request.data["message"]
         == "Create service failed. Fix the error(s) below"

@@ -30,6 +30,10 @@ class DefaultRenderer(JSONRenderer):
         """
         format response data for application views
         """
+        if renderer_context["response"].status_code == 422:
+            renderer_context[
+                "response"
+            ].status_code = status.HTTP_400_BAD_REQUEST
         status_code = renderer_context["response"].status_code
         if renderer_context["request"].method == "GET":
             if renderer_context["kwargs"] == {}:

@@ -43,7 +43,7 @@ def test_create_output_file_with_erros(client, generate_access_token1):
     data["service"] = "wrongservice"
     data["data_format"] = "badone"
     request = client.post(URL, data, HTTP_AUTHORIZATION=f"Bearer {token}")
-    assert request.status_code == 422
+    assert request.status_code == 400
     assert (
         request.data["message"]
         == "Create output file failed. Fix the error(s) below"

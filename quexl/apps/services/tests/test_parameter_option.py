@@ -46,7 +46,7 @@ def test_create_parameter_option_with_erros(client, generate_access_token1):
     }
     data["parameter"] = "wrongservice"
     request = client.post(URL, data, HTTP_AUTHORIZATION=f"Bearer {token}")
-    assert request.status_code == 422
+    assert request.status_code == 400
     assert (
         request.data["message"]
         == "Create parameter option failed. Fix the error(s) below"
