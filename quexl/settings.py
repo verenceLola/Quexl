@@ -22,10 +22,11 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # See https://docs.djangoproject.com/en/2.2/howto/deployment/checklist/
 
 
-# ALLOWED_HOSTS = [
-#     "*",
-#     "http://localhost:4200",
-# ]  # TODO Add list of allowed hosts
+ALLOWED_HOSTS = [
+    "*",
+    "http://localhost:4200",
+    "https://quexl-api-staging.herokuapp.com",
+]  # TODO Add list of allowed hosts
 CORS_ORIGIN_ALLOW_ALL = True  # TODO Change to False
 # Application definition
 
