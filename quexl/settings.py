@@ -26,7 +26,7 @@ ALLOWED_HOSTS = [
     "*",
     "http://localhost:4200",
 ]  # TODO Add list of allowed hosts
-# CORS_ORIGIN_ALLOW_ALL = True  # TODO Change to False
+CORS_ORIGIN_ALLOW_ALL = True  # TODO Change to False
 # Application definition
 
 # Application definition
