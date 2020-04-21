@@ -20,7 +20,7 @@ class UserActivationAPIView(GenericAPIView):
 
         try:
             data = JWTAuthentication.decode_jwt(token)
-            user = User.objects.get(username=data["userdata"]["username"])
+            user = User.objects.get(username=data["userdata"])
         except (User.DoesNotExist, jwt.exceptions.DecodeError):
 
             return Response(
