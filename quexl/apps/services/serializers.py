@@ -147,6 +147,16 @@ class CategorySerializer(serializers.ModelSerializer):
         return instance
 
 
+class ParameterTemplateSerializer(serializers.ModelSerializer):
+    """
+    serializer for the Parameter template model
+    """
+
+    class Meta:
+        model = ParameterTemplate
+        fields = "__all__"
+
+
 class ServicesSerializer(PriceSerializerWrapper):
     """
     serializer for the services model
@@ -156,6 +166,15 @@ class ServicesSerializer(PriceSerializerWrapper):
         model = Service
         fields = "__all__"
         read_only_fields = ("category", "seller", "created_at", "updated_at")
+
+    parameter_templates = serializers.SerializerMethodField()
+
+    def get_parameter_templates(self, service):
+        queryset = ParameterTemplate.objects.filter(service=service.pk)
+        serializer = ParameterTemplateSerializer(
+            queryset, many=True, context=self.context
+        )
+        return serializer.data
 
     def create(self, validated_data):
         """
@@ -172,16 +191,6 @@ class ServicesSerializer(PriceSerializerWrapper):
         if datetime.utcnow().replace(tzinfo=UTC) > value:
             raise ValidationError("Delivery time cannot be a past date")
         return value
-
-
-class ParameterTemplateSerializer(serializers.ModelSerializer):
-    """
-    serializer for the Parameter template model
-    """
-
-    class Meta:
-        model = ParameterTemplate
-        fields = "__all__"
 
 
 class ParameterOptionSerializer(PriceSerializerWrapper):
