@@ -89,7 +89,9 @@ class Order(models.Model):
         Parameter, on_delete=models.CASCADE, blank=True, null=True
     )
     data_file = models.ForeignKey(DataFile, on_delete=models.CASCADE)
-    status = models.CharField(max_length=50, choices=ORDER_STATUS)
+    status = models.CharField(
+        max_length=50, choices=ORDER_STATUS, default="processing"
+    )
     price = MoneyField(
         max_digits=19, decimal_places=4, default=0.0000, default_currency="USD"
     )
