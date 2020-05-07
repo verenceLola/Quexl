@@ -19,7 +19,7 @@ def test_create_new_user():
     user = User.objects.create_user(**userdata)
     users = User.objects.all()
     assert users.count() == 1
-    assert not user.is_active  # confirm new user is not active
+    assert user.is_active  # confirm new user is active
 
 
 def test_object_string_representation(create_db_user):
