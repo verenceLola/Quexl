@@ -24,6 +24,16 @@ class ParameterSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
 
+async def check_status(queryset):  # pragma: no cover
+    api_key = os.environ["EXTERNAL_API_KEY"]
+    try:
+        uri = "https://sandbox.zamzar.com/v1/jobs/{}".format(queryset.job_id)
+        response = requests.get(uri, auth=HTTPBasicAuth(api_key, ""))
+        return response
+    except BaseException:
+        raise NotFound("Resource not found")
+
+
 class OrderSerializer(PriceSerializerWrapper):
     """Serializer for the order model"""
 
@@ -37,6 +47,20 @@ class OrderSerializer(PriceSerializerWrapper):
             "created_at",
             "updated_at",
         )
+
+    output_url = serializers.SerializerMethodField()
+
+    def get_output_url(self, resp):
+        async def main():
+            response = await check_status(resp)
+            return response
+
+        res = asyncio.run(main())
+        file_id = res.json()["target_files"][0]["id"]
+        endpoint = "https://sandbox.zamzar.com/v1/files/{}/content".format(
+            file_id
+        )
+        return endpoint
 
     def create(self, validated_data):  # pragma: no cover  #TODO
         """create an order with the buyer as the logged in user"""
