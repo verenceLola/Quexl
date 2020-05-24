@@ -19,7 +19,7 @@ class ProfileRenderer(JSONRenderer):
         renderer_context=None,
     ) -> bytes:
         status_code = renderer_context["response"].status_code
-        profile_id = renderer_context["kwargs"]["username"]
+        profile_id = renderer_context["kwargs"]["id"]
         operation = getattr(renderer_context["view"], "operation", None)
 
         data = (

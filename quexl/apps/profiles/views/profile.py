@@ -12,9 +12,9 @@ from quexl.apps.profiles.serializers import ProfileSerializer
 class ProfileGenericAPIView(RetrieveUpdateAPIView):
     permission_classes = (IsAuthenticated, IsOwnerOrReadOnly)
     serializer_class = ProfileSerializer
-    lookup_url_kwarg = "username"
+    lookup_url_kwarg = "id"
     renderer_classes = (renderers.ProfileRenderer,)
-    lookup_field = "user__username"
+    lookup_field = "user__id"
     name = "profiles"
     queryset = Profile.objects.all()
 

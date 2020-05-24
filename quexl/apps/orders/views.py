@@ -38,7 +38,7 @@ class ParameterList(ListCreateAPIView):
     serializer_class = ParameterSerializer
     renderer_classes = (DefaultRenderer,)
 
-    def create(self, request, **kwargs):
+    def create(self, request, **kwargs):  # pragma: no cover
         """overide creating of parameter """
         self.operation = "Create parameter "
         return super(ListCreateAPIView, self).create(request, **kwargs)
@@ -67,7 +67,7 @@ class DataFileList(ListCreateAPIView):
     renderer_classes = (DefaultRenderer,)
     serializer_class = DataFileSerializer
 
-    def create(self, request, **kwargs):
+    def create(self, request, **kwargs):  # pragma: no cover
         """overide creating of data_file"""
         self.operation = "create data_file"
         return super(ListCreateAPIView, self).create(request, **kwargs)
@@ -83,7 +83,7 @@ class DataFileDetail(RetrieveUpdateDestroyAPIViewWrapper):
     serializer_class = DataFileSerializer
     renderer_classes = (DefaultRenderer,)
 
-    def update(self, request, *args, **kwargs):
+    def update(self, request, *args, **kwargs):  # pragma: no cover
         """overide the update method"""
         self.operation = "data_file"
         return self.super(RetrieveUpdateDestroyAPIViewWrapper, self).update(
@@ -100,7 +100,7 @@ class OrderList(ListCreateAPIView):
     renderer_classes = (DefaultRenderer,)
     serializer_class = OrderSerializer
 
-    def create(self, request, **kwargs):
+    def create(self, request, **kwargs):  # pragma: no cover
         """overide creating of order"""
         self.operation = "Create order"
         return super(ListCreateAPIView, self).create(request, **kwargs)
@@ -130,7 +130,7 @@ class OrderDetail(RetrieveUpdateDestroyAPIViewWrapper):
     serializer_class = OrderSerializer
     renderer_classes = (DefaultRenderer,)
 
-    def update(self, request, *args, **kwargs):
+    def update(self, request, *args, **kwargs):  # pragma: no cover
         self.operation = "update order"
         return super(RetrieveUpdateDestroyAPIViewWrapper, self).update(
             request, *args, **kwargs
@@ -146,6 +146,22 @@ class HistoryList(ListAPIView):
     renderer_classes = (DefaultRenderer,)
     serializer_class = HistorySerializer
 
+    def get_queryset(self):
+        service = self.request.query_params.get("history", "")
+        owner = self.request.query_params.get("owner", "")
+        filter_date = self.request.query_params.get("date", "1970-01-01")
+        if self.request.user.is_superuser:
+            hists = (
+                History.objects.filter(order__service=service)
+                .filter(history_owner=owner)
+                .filter(created_at__gte=filter_date)
+            )
+            return hists
+        hists = History.objects.filter(history_owner=self.request.user).filter(
+            created_at__gte=filter_date
+        )
+        return hists
+
 
 class HistoryDetail(RetrieveUpdateDestroyAPIViewWrapper):
     """view for retrieving, updating and destroying a history"""
@@ -157,7 +173,7 @@ class HistoryDetail(RetrieveUpdateDestroyAPIViewWrapper):
     serializer_class = HistorySerializer
     renderer_classes = (DefaultRenderer,)
 
-    def update(self, request, *args, **kwargs):
+    def update(self, request, *args, **kwargs):  # pragma: no cover
         self.operation = "update history"
         return super(RetrieveUpdateDestroyAPIViewWrapper, self).update(
             request, *args, **kwargs

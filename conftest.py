@@ -37,6 +37,34 @@ def create_db_user(django_user_model: Type[User]) -> User:
 
 
 @pytest.fixture
+def create_db_user_deactivate(django_user_model: Type[User]) -> User:
+    """
+    create a db user to deactivate
+    """
+    user_details = {
+        "username": "userd",
+        "password": "pass123",
+        "email": "userd@quexl.com",
+    }
+    user_d = django_user_model.objects.create_user(**user_details)
+    user_d.save()
+    return user_d
+
+
+@pytest.fixture
+def generate_access_token_deactivate(
+    create_db_user_deactivate: User,
+) -> Tuple[str, User]:
+    """
+    """
+    user_d = create_db_user_deactivate
+    user_details = {"username": user_d.username, "email": user_d.email}
+    jwt = JWTAuthentication()
+    encoded_token = jwt.generate_token(user_details)
+    return encoded_token, user_d
+
+
+@pytest.fixture
 def generate_access_token1(create_db_user: User) -> Tuple[str, User]:
     """
     """

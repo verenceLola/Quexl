@@ -14,8 +14,8 @@ def test_view_user_profile(client, generate_access_token1):
     test that user profile has all the required fields
     """
     token, user = generate_access_token1
-    username = user.username
-    profile_url = reverse("profiles:user_profiles", args=[username])
+    id = user.id
+    profile_url = reverse("profiles:user_profiles", args=[id])
     response = client.get(profile_url, HTTP_AUTHORIZATION="Bearer " + token)
     assert response.status_code == 200
     assert response.data["title"] == ""
@@ -50,8 +50,8 @@ def test_edit_profile_fields_correctly(
     test editing profile fields
     """
     token, user = generate_access_token1
-    username = user.username
-    profile_url = reverse("profiles:user_profiles", args=[username])
+    id = user.id
+    profile_url = reverse("profiles:user_profiles", args=[id])
     response = client.patch(
         profile_url,
         field_value,

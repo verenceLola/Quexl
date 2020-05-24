@@ -8,5 +8,5 @@ class UserSerializer(serializers.ModelSerializer):
     """
 
     class Meta:
-        fields = ("email", "username", "id")
+        fields = ("email", "username", "id", "is_active")
         model = get_user_model()

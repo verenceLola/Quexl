@@ -3,6 +3,8 @@ from .password import ForgotPasswordView
 from .password import ResetPasswordView
 from .signup import SignUpAPIView
 from .social_auth import SocialAuthView
+from .user import ActivateUserAPIView
 from .user import CurrentUserRetriveAPIView
+from .user import DeactivateUserAPIView
 from .user import UserActivationAPIView
 from .user import UserResourceAPIView

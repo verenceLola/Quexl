@@ -12,8 +12,8 @@ def test_create_work_experience(client, generate_access_token1):
     test creating work experience for user profile
     """
     token, user = generate_access_token1
-    username = user.username
-    profile_url = reverse("profiles:user_profiles", args=[username])
+    id = user.id
+    profile_url = reverse("profiles:user_profiles", args=[id])
     response = client.patch(
         profile_url,
         {"work_experience": [work_experience]},
@@ -32,8 +32,8 @@ def test_add_duplicate_profile_work_experience(client, generate_access_token1):
     test user cannot add duplicate work experience info
     """
     token, user = generate_access_token1
-    username = user.username
-    profile_url = reverse("profiles:user_profiles", args=[username])
+    id = user.id
+    profile_url = reverse("profiles:user_profiles", args=[id])
     response = client.patch(
         profile_url,
         {"work_experience": [work_experience, work_experience]},
@@ -53,8 +53,8 @@ def test_work_experience_start_data(client, generate_access_token1):
     test setting work experience to future date
     """
     token, user = generate_access_token1
-    username = user.username
-    profile_url = reverse("profiles:user_profiles", args=[username])
+    id = user.id
+    profile_url = reverse("profiles:user_profiles", args=[id])
     new_work_experience = work_experience.copy()
     new_work_experience.update({"start_date": now() + timedelta(hours=3)})
     response = client.patch(
@@ -72,8 +72,8 @@ def test_work_experience_end_date(client, generate_access_token1):
     test end date for work experience is valid
     """
     token, user = generate_access_token1
-    username = user.username
-    profile_url = reverse("profiles:user_profiles", args=[username])
+    id = user.id
+    profile_url = reverse("profiles:user_profiles", args=[id])
     new_work_experience = work_experience.copy()
     new_work_experience.update({"end_date": "2018-10-25 22:58:55.216869+03"})
     response = client.patch(
@@ -106,8 +106,8 @@ def test_required_work_experience_fields(
     test required work experience fields
     """
     token, user = generate_access_token1
-    username = user.username
-    profile_url = reverse("profiles:user_profiles", args=[username])
+    id = user.id
+    profile_url = reverse("profiles:user_profiles", args=[id])
     new_work_experience = work_experience.copy()
     new_work_experience.pop(fieldName)
     response = client.patch(

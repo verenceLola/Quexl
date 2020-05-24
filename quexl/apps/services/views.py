@@ -5,6 +5,7 @@ from rest_framework.generics import ListAPIView
 from rest_framework.generics import ListCreateAPIView
 from rest_framework.permissions import IsAuthenticated
 
+from quexl.apps.account.models import User
 from quexl.apps.orders.models import Order
 from quexl.apps.orders.serializers import OrderSerializer
 from quexl.apps.services.models import Category
@@ -75,9 +76,17 @@ class ServicesList(ListCreateAPIView):
     renderer_classes = (DefaultRenderer,)
     serializer_class = ServicesSerializer
 
+    def get_queryset(self):
+        services = Service.objects.order_by("-created_at")
+        return services
+
     def create(self, request, **kwargs):
         """overide creating of service"""
         self.operation = "Create service"
+        user = User.objects.get(id=request.user.id)
+        if not user.service_creator:
+            user.service_creator = True
+            user.save()
         return super(ListCreateAPIView, self).create(request, **kwargs)
 
 
@@ -110,10 +119,20 @@ class ServiceOrdersList(ListAPIView):
     serializer_class = OrderSerializer
 
     def get_queryset(self):
-        service = self.request.query_params.get("service")
-        orders = Order.objects.filter(service=service).filter(
-            service__seller=self.request.user
-        )
+        service = self.request.query_params.get("service", "")
+        user = self.request.query_params.get("seller", "")
+        filter_date = self.request.query_params.get("date", "1970-01-01")
+        seller = User.objects.get(id=user)
+        if self.request.user.is_superuser:
+            orders = (
+                Order.objects.filter(service=service)
+                .filter(service__seller=seller)
+                .filter(created_at__gte=filter_date)
+            )
+        else:
+            orders = Order.objects.filter(service=service).filter(
+                service__seller=self.request.user
+            )
         return orders
 
 

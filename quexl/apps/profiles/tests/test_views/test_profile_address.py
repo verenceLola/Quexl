@@ -10,8 +10,8 @@ def test_edit_profile_address(client, generate_access_token1):
     test editing profile address
     """
     token, user = generate_access_token1
-    username = user.username
-    profile_url = reverse("profiles:user_profiles", args=[username])
+    id = user.id
+    profile_url = reverse("profiles:user_profiles", args=[id])
     response = client.patch(
         profile_url,
         {"address": [address]},
@@ -27,8 +27,8 @@ def test_add_duplicate_profile_address(client, generate_access_token1):
     test adding duplicate profile addresses
     """
     token, user = generate_access_token1
-    username = user.username
-    profile_url = reverse("profiles:user_profiles", args=[username])
+    id = user.id
+    profile_url = reverse("profiles:user_profiles", args=[id])
     response = client.patch(
         profile_url,
         {"address": [address, address]},
@@ -46,8 +46,8 @@ def test_invalid_country_in_profile_address(client, generate_access_token1):
     test adding address with invalid country code
     """
     token, user = generate_access_token1
-    username = user.username
-    profile_url = reverse("profiles:user_profiles", args=[username])
+    id = user.id
+    profile_url = reverse("profiles:user_profiles", args=[id])
     # update country value
     new_address = address.copy()
     new_address.update({"country": "invalid_country_code"})
@@ -71,8 +71,8 @@ def test_invalid_country_in_profile_address(client, generate_access_token1):
 )
 def test_invalid_address_fields(client, generate_access_token1, fieldName):
     token, user = generate_access_token1
-    username = user.username
-    profile_url = reverse("profiles:user_profiles", args=[username])
+    id = user.id
+    profile_url = reverse("profiles:user_profiles", args=[id])
     # update fieldName value to invalid string
     new_address = address.copy()
     new_address[fieldName] = "7868strin"
@@ -107,8 +107,8 @@ def test_required_field_for_profile_address(
     test all required fields for profile address
     """
     token, user = generate_access_token1
-    username = user.username
-    profile_url = reverse("profiles:user_profiles", args=[username])
+    id = user.id
+    profile_url = reverse("profiles:user_profiles", args=[id])
     new_address = address.copy()
     new_address.pop(fieldName)
     response = client.patch(
