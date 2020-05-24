@@ -85,6 +85,11 @@ class Service(models.Model):
     services model
     """
 
+    STATUS_CHOICES = [
+        ("10", "Start"),
+        ("20", "Exceptions"),
+        ("30", "Success"),
+    ]
     id = models.CharField(
         db_index=True,
         max_length=256,
@@ -107,6 +112,9 @@ class Service(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
     category = TreeForeignKey(
         "Category", on_delete=models.CASCADE, null=True, blank=True
+    )
+    service_status = models.CharField(
+        max_length=10, choices=STATUS_CHOICES, default="10"
     )
     is_published = models.BooleanField(default=False)
     sub_category = models.CharField(max_length=150, blank=True)

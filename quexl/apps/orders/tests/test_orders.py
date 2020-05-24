@@ -6,7 +6,7 @@ import json
 from django.urls import reverse
 
 
-def test_list_data_files(client, generate_access_token1, create_data_file):
+def test_list_orders(client, generate_access_token1, create_data_file):
     """test listing of orders"""
     url = reverse("order:orders")
     token, _ = generate_access_token1
