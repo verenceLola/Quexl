@@ -12,8 +12,8 @@ def test_edit_profile_education_details(client, generate_access_token1):
     test edit education details for a given profile id
     """
     token, user = generate_access_token1
-    username = user.username
-    profile_url = reverse("profiles:user_profiles", args=[username])
+    id = user.id
+    profile_url = reverse("profiles:user_profiles", args=[id])
     response = client.patch(
         profile_url,
         {"education": [education]},
@@ -31,8 +31,8 @@ def test_invalid_education_country(client, generate_access_token1):
     test updating education with invalid country code
     """
     token, user = generate_access_token1
-    username = user.username
-    profile_url = reverse("profiles:user_profiles", args=[username])
+    id = user.id
+    profile_url = reverse("profiles:user_profiles", args=[id])
     new_education = education.copy()
     new_education.update({"country": "invalid_country"})
     response = client.patch(
@@ -50,8 +50,8 @@ def test_duplicate_education_info(client, generate_access_token1):
     test duplicate education info
     """
     token, user = generate_access_token1
-    username = user.username
-    profile_url = reverse("profiles:user_profiles", args=[username])
+    id = user.id
+    profile_url = reverse("profiles:user_profiles", args=[id])
     response = client.patch(
         profile_url,
         {"education": [education, education]},
@@ -83,8 +83,8 @@ def test_missing_fields_for_education(
     test missing/ required fields for profile education
     """
     token, user = generate_access_token1
-    username = user.username
-    profile_url = reverse("profiles:user_profiles", args=[username])
+    id = user.id
+    profile_url = reverse("profiles:user_profiles", args=[id])
     new_education = education.copy()
     new_education.pop(fieldName)
     response = client.patch(
@@ -112,8 +112,8 @@ def test_on_going_and_end_date_for_education(
     ensure at least on_going or end_date fields are provided
     """
     token, user = generate_access_token1
-    username = user.username
-    profile_url = reverse("profiles:user_profiles", args=[username])
+    id = user.id
+    profile_url = reverse("profiles:user_profiles", args=[id])
     new_education = education.copy()
     new_education["end_date"] = end_date
     response = client.patch(
@@ -135,8 +135,8 @@ def test_education_level_choices(client, generate_access_token1, choice):
     test all education level choices
     """
     token, user = generate_access_token1
-    username = user.username
-    profile_url = reverse("profiles:user_profiles", args=[username])
+    id = user.id
+    profile_url = reverse("profiles:user_profiles", args=[id])
     new_education = education.copy()
     new_education["level"] = choice
     response = client.patch(
@@ -154,8 +154,8 @@ def test_education_level_invalid_choice(client, generate_access_token1):
     test invalid education level value
     """
     token, user = generate_access_token1
-    username = user.username
-    profile_url = reverse("profiles:user_profiles", args=[username])
+    id = user.id
+    profile_url = reverse("profiles:user_profiles", args=[id])
     new_education = education.copy()
     new_education.update({"level": "invalid_value"})
     response = client.patch(

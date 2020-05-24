@@ -6,7 +6,7 @@ app_name = "profiles"
 
 urlpatterns = [
     path(
-        "profile/<str:username>",
+        "profile/<str:id>",
         ProfileGenericAPIView.as_view(),
         name="user_profiles",
     )

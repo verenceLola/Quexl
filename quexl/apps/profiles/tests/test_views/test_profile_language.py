@@ -10,8 +10,8 @@ def test_required_profile_language_fields(
     test update profile languages info
     """
     token, user = generate_access_token1
-    username = user.username
-    profile_url = reverse("profiles:user_profiles", args=[username])
+    id = user.id
+    profile_url = reverse("profiles:user_profiles", args=[id])
     language = {"name": "sw", "fluency": "limited"}
     language.pop(fieldName)
     response = client.patch(

@@ -10,8 +10,8 @@ def test_edit_profile_skill_info(client, generate_access_token1):
     test create profile skills info
     """
     token, user = generate_access_token1
-    username = user.username
-    profile_url = reverse("profiles:user_profiles", args=[username])
+    id = user.id
+    profile_url = reverse("profiles:user_profiles", args=[id])
     response = client.patch(
         profile_url,
         {"skills": [skill]},
@@ -29,8 +29,8 @@ def test_duplicate_skills(client, generate_access_token1):
     test duplicate skill info for a given profile
     """
     token, user = generate_access_token1
-    username = user.username
-    profile_url = reverse("profiles:user_profiles", args=[username])
+    id = user.id
+    profile_url = reverse("profiles:user_profiles", args=[id])
     response = client.patch(
         profile_url,
         {"skills": [skill, skill]},
@@ -48,8 +48,8 @@ def test_invalid_skill_expertise_value(client, generate_access_token1):
     test invalid skill expertice value
     """
     token, user = generate_access_token1
-    username = user.username
-    profile_url = reverse("profiles:user_profiles", args=[username])
+    id = user.id
+    profile_url = reverse("profiles:user_profiles", args=[id])
     new_skill = skill.copy()
     new_skill.update({"expertise": "invalid_value"})
     response = client.patch(
@@ -71,8 +71,8 @@ def test_skill_expertice_choices(client, generate_access_token1, choice):
     test all skill expertice choices
     """
     token, user = generate_access_token1
-    username = user.username
-    profile_url = reverse("profiles:user_profiles", args=[username])
+    id = user.id
+    profile_url = reverse("profiles:user_profiles", args=[id])
     new_skill = skill.copy()
     new_skill["expertise"] = choice
     response = client.patch(
@@ -91,8 +91,8 @@ def test_required_skills_fields(client, generate_access_token1, fieldName):
     test required fields for skills info
     """
     token, user = generate_access_token1
-    username = user.username
-    profile_url = reverse("profiles:user_profiles", args=[username])
+    id = user.id
+    profile_url = reverse("profiles:user_profiles", args=[id])
     new_skill = skill.copy()
     new_skill.pop(fieldName)
     response = client.patch(

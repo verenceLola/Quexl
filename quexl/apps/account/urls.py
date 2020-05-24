@@ -14,6 +14,16 @@ urlpatterns = [
         name="activate_user",
     ),
     path(
+        "auth/deactivate/<str:id>",
+        views.DeactivateUserAPIView.as_view(),
+        name="deactivate_user",
+    ),
+    path(
+        "auth/activate/<str:id>",
+        views.ActivateUserAPIView.as_view(),
+        name="activate",
+    ),
+    path(
         "users/forgot_password",
         views.ForgotPasswordView.as_view(),
         name="forgot_password",

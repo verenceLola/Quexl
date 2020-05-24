@@ -28,6 +28,7 @@ class DataFile(models.Model):
     description = models.CharField(max_length=300, blank=True)
     data_format = models.ForeignKey(DataFormat, on_delete=models.CASCADE)
     data_file_upload = models.FileField(upload_to="uploads/")
+    file_owner = models.ForeignKey(User, on_delete=models.CASCADE, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -61,9 +62,12 @@ class History(models.Model):
         primary_key=True,
         editable=False,
     )
-    output_url = models.CharField(max_length=100)
-    description = models.TextField(blank=True)
+    output_url = models.CharField(max_length=100, blank=True, null=True)
+    description = models.TextField(blank=True, null=True)
     data_file = models.ManyToManyField(DataFile)
+    history_owner = models.ForeignKey(
+        User, on_delete=models.CASCADE, null=True
+    )
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 

@@ -50,7 +50,7 @@ class OrderSerializer(PriceSerializerWrapper):
 
     output_url = serializers.SerializerMethodField()
 
-    def get_output_url(self, resp):
+    def get_output_url(self, resp):  # pragma: no cover
         async def main():
             response = await check_status(resp)
             return response
@@ -90,6 +90,7 @@ class OrderSerializer(PriceSerializerWrapper):
                     data = {}
                     data["output_url"] = uri
                     data["data_file"] = [validated_data["data_file"].id]
+                    data["history_owner"] = validated_data["buyer"]
                     serializer = HistorySerializer(data=data)
                     if serializer.is_valid(raise_exception=True):
                         hist = serializer.save()
@@ -114,9 +115,14 @@ class DataFileSerializer(serializers.ModelSerializer):
         model = DataFile
         fields = "__all__"
 
+    def create(self, validated_data):
+        validated_data.update({"file_owner": self.context["request"].user})
+        data_file = DataFile.objects.create(**validated_data)
+        return data_file
+
 
 class HistorySerializer(serializers.ModelSerializer):
-    """Serializer for the istory model"""
+    """Serializer for the history model"""
 
     class Meta:
         model = History
