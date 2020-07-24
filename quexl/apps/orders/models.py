@@ -1,5 +1,4 @@
 from django.db import models
-from djmoney.models.fields import MoneyField
 
 from quexl.apps.account.models import User
 from quexl.apps.services.models import DataFormat
@@ -96,8 +95,22 @@ class Order(models.Model):
     status = models.CharField(
         max_length=50, choices=ORDER_STATUS, default="processing"
     )
-    price = MoneyField(
-        max_digits=19, decimal_places=4, default=0.0000, default_currency="USD"
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+
+class PaypalPayment(models.Model):
+    """payment model"""
+
+    id = models.CharField(
+        db_index=True,
+        max_length=256,
+        default=fancy_id_generator,
+        primary_key=True,
+        editable=False,
     )
+    paypal_id = models.CharField(max_length=100)
+    description = models.TextField(blank=True, null=True)
+    order = models.ForeignKey(Order, on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)

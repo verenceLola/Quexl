@@ -11,7 +11,6 @@ from quexl.apps.orders.models import DataFile
 from quexl.apps.orders.models import History
 from quexl.apps.orders.models import Order
 from quexl.apps.orders.models import Parameter
-from quexl.apps.services.serializers import PriceSerializerWrapper
 
 
 class ParameterSerializer(serializers.ModelSerializer):
@@ -34,7 +33,7 @@ async def check_status(queryset):  # pragma: no cover
         raise NotFound("Resource not found")
 
 
-class OrderSerializer(PriceSerializerWrapper):
+class OrderSerializer(serializers.ModelSerializer):
     """Serializer for the order model"""
 
     class Meta:
@@ -49,6 +48,8 @@ class OrderSerializer(PriceSerializerWrapper):
         )
 
     output_url = serializers.SerializerMethodField()
+    total_price = serializers.SerializerMethodField()
+    currency_type = serializers.SerializerMethodField()
 
     def get_output_url(self, resp):  # pragma: no cover
         async def main():
@@ -56,11 +57,30 @@ class OrderSerializer(PriceSerializerWrapper):
             return response
 
         res = asyncio.run(main())
-        file_id = res.json()["target_files"][0]["id"]
-        endpoint = "https://sandbox.zamzar.com/v1/files/{}/content".format(
-            file_id
-        )
+        if res.json()["status"] == "successful":
+            file_id = res.json()["target_files"][0]["id"]
+            endpoint = "https://sandbox.zamzar.com/v1/files/{}/content".format(
+                file_id
+            )
+        else:
+            endpoint = "Still {}...".format(res.json()["status"])
         return endpoint
+
+    def get_total_price(self, obj):
+        """Returns the total charge of the service"""
+        service_price = obj.service.price
+        parameter_temp_price = (
+            obj.parameter.parameter_template.parameter_option.price
+        )
+        total = float(parameter_temp_price.amount) + float(
+            service_price.amount
+        )
+        return total
+
+    def get_currency_type(self, obj):
+        """Returns the currence used"""
+        currency = obj.service.price.currency
+        return currency.code
 
     def create(self, validated_data):  # pragma: no cover  #TODO
         """create an order with the buyer as the logged in user"""
@@ -90,7 +110,7 @@ class OrderSerializer(PriceSerializerWrapper):
                     data = {}
                     data["output_url"] = uri
                     data["data_file"] = [validated_data["data_file"].id]
-                    data["history_owner"] = validated_data["buyer"]
+                    data["history_owner"] = validated_data["buyer"].id
                     serializer = HistorySerializer(data=data)
                     if serializer.is_valid(raise_exception=True):
                         hist = serializer.save()
