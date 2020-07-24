@@ -2,16 +2,21 @@
 orders views
 """
 import asyncio
+import json
 import os
 
 import environ
 import requests
 from requests.auth import HTTPBasicAuth
+from rest_framework import status
 from rest_framework.exceptions import NotFound
+from rest_framework.generics import GenericAPIView
 from rest_framework.generics import ListAPIView
 from rest_framework.generics import ListCreateAPIView
 from rest_framework.generics import RetrieveAPIView
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.request import Request
+from rest_framework.response import Response
 
 from quexl.apps.orders.models import DataFile
 from quexl.apps.orders.models import History
@@ -23,7 +28,9 @@ from quexl.apps.orders.serializers import OrderSerializer
 from quexl.apps.orders.serializers import ParameterSerializer
 from quexl.helpers.model_wrapper import RetrieveUpdateDestroyAPIViewWrapper
 from quexl.helpers.permissions import IsBuyerOrReadOnly
+from quexl.utils.paypal_access_token import paypal_token
 from quexl.utils.renderers import DefaultRenderer
+from quexl.utils.save_payment_details import save_payment_details
 
 
 class ParameterList(ListCreateAPIView):
@@ -255,3 +262,59 @@ class DownloadOrder(RetrieveAPIView):
 
         asyncio.run(main())
         return super(RetrieveAPIView, self).retrieve(request, *args, **kwargs)
+
+
+class MakePayment(GenericAPIView):
+    """Make payment using paypal"""
+
+    permission_classes = (
+        IsAuthenticated,
+        IsBuyerOrReadOnly,
+    )
+    operation = "Account activation"
+
+    def post(self, request: Request) -> Response:
+        """Make payments on paypal"""
+        order = Order.objects.get(pk=request.data.get("order"))
+        if not order:
+            return Response(
+                {"message": "Error ", "data": "Order does not exist"},
+                status=status.HTTP_201_CREATED,
+            )
+        try:
+            token = paypal_token().json()["access_token"]
+            headers = {
+                "Content-Type": "application/json",
+                "Authorization": "Bearer " + token,
+            }
+            url = "https://api.sandbox.paypal.com/v2/checkout/orders"
+            purchase_units = []
+            purchase_unit = {}
+            amount = {}
+            s_price = order.service.price.amount
+            pt_price = (
+                order.parameter.parameter_template.parameter_option.price.amount
+            )
+            amount["currency_code"] = order.service.price.currency.code
+            amount["value"] = float(s_price) + float(pt_price)
+            intent = request.data.get("intent", "CAPTURE")
+            purchase_unit["amount"] = amount
+            purchase_units.append(purchase_unit)
+            data = {"intent": intent, "purchase_units": purchase_units}
+            result = requests.post(url, data=json.dumps(data), headers=headers)
+            save_payment_details(order=order, paypal_id=result.json()["id"])
+            return Response(
+                {
+                    "message": "Payment made successfully",
+                    "data": result.json(),
+                },
+                status=status.HTTP_201_CREATED,
+            )
+        except Exception as e:
+            return Response(
+                {
+                    "message": "Error while making payment",
+                    "meta": {"data": e},
+                },
+                status=status.HTTP_201_CREATED,
+            )
