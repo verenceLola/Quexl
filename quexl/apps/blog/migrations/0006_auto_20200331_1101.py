@@ -16,8 +16,14 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.AlterModelOptions(name="comment", options={},),
-        migrations.AlterUniqueTogether(name="comment", unique_together=set(),),
+        migrations.AlterModelOptions(
+            name="comment",
+            options={},
+        ),
+        migrations.AlterUniqueTogether(
+            name="comment",
+            unique_together=set(),
+        ),
         migrations.CreateModel(
             name="Reply",
             fields=[
@@ -51,9 +57,24 @@ class Migration(migrations.Migration):
                 ),
             ],
         ),
-        migrations.RemoveField(model_name="comment", name="level",),
-        migrations.RemoveField(model_name="comment", name="lft",),
-        migrations.RemoveField(model_name="comment", name="parent",),
-        migrations.RemoveField(model_name="comment", name="rght",),
-        migrations.RemoveField(model_name="comment", name="tree_id",),
+        migrations.RemoveField(
+            model_name="comment",
+            name="level",
+        ),
+        migrations.RemoveField(
+            model_name="comment",
+            name="lft",
+        ),
+        migrations.RemoveField(
+            model_name="comment",
+            name="parent",
+        ),
+        migrations.RemoveField(
+            model_name="comment",
+            name="rght",
+        ),
+        migrations.RemoveField(
+            model_name="comment",
+            name="tree_id",
+        ),
     ]

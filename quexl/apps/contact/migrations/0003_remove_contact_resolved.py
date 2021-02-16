@@ -10,5 +10,8 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.RemoveField(model_name="contact", name="resolved",),
+        migrations.RemoveField(
+            model_name="contact",
+            name="resolved",
+        ),
     ]

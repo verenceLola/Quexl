@@ -14,7 +14,8 @@ class Migration(migrations.Migration):
 
     operations = [
         migrations.AlterModelOptions(
-            name="comment", options={"verbose_name_plural": "comments"},
+            name="comment",
+            options={"verbose_name_plural": "comments"},
         ),
         migrations.AddField(
             model_name="comment",
@@ -53,6 +54,7 @@ class Migration(migrations.Migration):
             preserve_default=False,
         ),
         migrations.AlterUniqueTogether(
-            name="comment", unique_together={("parent", "body")},
+            name="comment",
+            unique_together={("parent", "body")},
         ),
     ]

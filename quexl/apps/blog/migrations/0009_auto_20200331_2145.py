@@ -13,9 +13,11 @@ class Migration(migrations.Migration):
 
     operations = [
         migrations.AlterModelOptions(
-            name="dislike", options={"verbose_name_plural": "dislikes"},
+            name="dislike",
+            options={"verbose_name_plural": "dislikes"},
         ),
         migrations.AlterUniqueTogether(
-            name="dislike", unique_together={("user", "blog")},
+            name="dislike",
+            unique_together={("user", "blog")},
         ),
     ]

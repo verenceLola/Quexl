@@ -18,13 +18,21 @@ urlpatterns = [
         views.OrderDetail.as_view(),
         name="order",
     ),
-    path("parameter", views.ParameterList.as_view(), name="parameters",),
+    path(
+        "parameter",
+        views.ParameterList.as_view(),
+        name="parameters",
+    ),
     path(
         "parameter/<str:pk>",
         views.ParameterDetail.as_view(),
         name="parameter",
     ),
-    path("order/histories", views.HistoryList.as_view(), name="histories",),
+    path(
+        "order/histories",
+        views.HistoryList.as_view(),
+        name="histories",
+    ),
     path(
         "order/histories/<str:pk>",
         views.HistoryDetail.as_view(),

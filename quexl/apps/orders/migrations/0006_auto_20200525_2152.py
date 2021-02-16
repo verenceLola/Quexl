@@ -15,7 +15,9 @@ class Migration(migrations.Migration):
 
     operations = [
         migrations.RenameField(
-            model_name="datafile", old_name="owner", new_name="file_owner",
+            model_name="datafile",
+            old_name="owner",
+            new_name="file_owner",
         ),
         migrations.AddField(
             model_name="history",
