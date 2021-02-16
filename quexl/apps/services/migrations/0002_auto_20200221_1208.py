@@ -11,7 +11,10 @@ class Migration(migrations.Migration):
 
     operations = [
         migrations.RenameModel(
-            old_name="ParamerterTemplate", new_name="ParameterTemplate",
+            old_name="ParamerterTemplate",
+            new_name="ParameterTemplate",
         ),
-        migrations.DeleteModel(name="ParamerterOption",),
+        migrations.DeleteModel(
+            name="ParamerterOption",
+        ),
     ]

@@ -22,11 +22,31 @@ from quexl.apps.services.views import ServicesList
 app_name = "services"
 
 urlpatterns = [
-    path("categories/", CategoryList.as_view(), name="categories",),
-    path("categories/<str:pk>", CategoryDetail.as_view(), name="category",),
-    path("sell/services", ServicesList.as_view(), name="services",),
-    path("sell/orders", ServiceOrdersList.as_view(), name="service orders",),
-    path("sell/services/<str:pk>", ServicesDetail.as_view(), name="service",),
+    path(
+        "categories/",
+        CategoryList.as_view(),
+        name="categories",
+    ),
+    path(
+        "categories/<str:pk>",
+        CategoryDetail.as_view(),
+        name="category",
+    ),
+    path(
+        "sell/services",
+        ServicesList.as_view(),
+        name="services",
+    ),
+    path(
+        "sell/orders",
+        ServiceOrdersList.as_view(),
+        name="service orders",
+    ),
+    path(
+        "sell/services/<str:pk>",
+        ServicesDetail.as_view(),
+        name="service",
+    ),
     path(
         "parameter-template",
         ParameterTemplateList.as_view(),
@@ -47,14 +67,34 @@ urlpatterns = [
         ParameterOptionDetail.as_view(),
         name="parameter_option",
     ),
-    path("data-format", DataFormatList.as_view(), name="data_formats",),
     path(
-        "data-format/<str:pk>", DataFormatDetail.as_view(), name="data_format",
+        "data-format",
+        DataFormatList.as_view(),
+        name="data_formats",
     ),
-    path("output-file", OutputFileList.as_view(), name="output_files",),
     path(
-        "output-file/<str:pk>", OutputFileDetail.as_view(), name="output_file",
+        "data-format/<str:pk>",
+        DataFormatDetail.as_view(),
+        name="data_format",
     ),
-    path("gallery", GalleryList.as_view(), name="galleries",),
-    path("gallery/<str:pk>", GalleryDetail.as_view(), name="gallery",),
+    path(
+        "output-file",
+        OutputFileList.as_view(),
+        name="output_files",
+    ),
+    path(
+        "output-file/<str:pk>",
+        OutputFileDetail.as_view(),
+        name="output_file",
+    ),
+    path(
+        "gallery",
+        GalleryList.as_view(),
+        name="galleries",
+    ),
+    path(
+        "gallery/<str:pk>",
+        GalleryDetail.as_view(),
+        name="gallery",
+    ),
 ]

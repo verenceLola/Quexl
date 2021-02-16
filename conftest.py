@@ -55,8 +55,7 @@ def create_db_user_deactivate(django_user_model: Type[User]) -> User:
 def generate_access_token_deactivate(
     create_db_user_deactivate: User,
 ) -> Tuple[str, User]:
-    """
-    """
+    """"""
     user_d = create_db_user_deactivate
     user_details = {"username": user_d.username, "email": user_d.email}
     jwt = JWTAuthentication()
@@ -66,8 +65,7 @@ def generate_access_token_deactivate(
 
 @pytest.fixture
 def generate_access_token1(create_db_user: User) -> Tuple[str, User]:
-    """
-    """
+    """"""
     user1 = create_db_user
     user_details = {"username": user1.username, "email": user1.email}
     jwt = JWTAuthentication()
@@ -77,8 +75,7 @@ def generate_access_token1(create_db_user: User) -> Tuple[str, User]:
 
 @pytest.fixture
 def generate_access_token2(create_db_user2: User) -> Tuple[str, User]:
-    """
-    """
+    """"""
     user2 = create_db_user2
     user_details = {"username": user2.username, "email": user2.email}
     jwt = JWTAuthentication()

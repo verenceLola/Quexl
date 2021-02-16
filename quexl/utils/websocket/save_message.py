@@ -12,7 +12,7 @@ class SaveMessage:
     @staticmethod
     @database_sync_to_async
     def __call__(self: AsyncJsonWebsocketConsumer, text: str) -> Message:
-        """"
+        """ "
         save message to db
         """
         sender = self.scope["user"]

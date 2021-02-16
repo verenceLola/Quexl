@@ -10,6 +10,12 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.RemoveField(model_name="dislike", name="dislikes",),
-        migrations.RemoveField(model_name="like", name="likes",),
+        migrations.RemoveField(
+            model_name="dislike",
+            name="dislikes",
+        ),
+        migrations.RemoveField(
+            model_name="like",
+            name="likes",
+        ),
     ]

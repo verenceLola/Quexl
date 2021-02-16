@@ -69,7 +69,7 @@ class UserRoleAPIView(GenericAPIView):
             )
 
     def get(self, request: Request, user_id: str) -> Response:
-        """"
+        """ "
         get user roles
         """
         self.operation = "View user roles"

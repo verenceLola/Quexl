@@ -2,8 +2,8 @@ class Errors:
     @staticmethod
     def cleanErrorData(data: dict) -> dict:
         """
-            remove empty objects in the present in response data
-            """
+        remove empty objects in the present in response data
+        """
 
         for (field, errors) in data.items():
             if isinstance(errors, list):
