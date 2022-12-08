@@ -14,7 +14,7 @@ Babel==2.7.0
 bcrypt==3.1.7
 black==19.10b0
 blinker==1.4
-certifi==2019.9.11
+certifi==2022.12.7
 cffi==1.12.3
 cfgv==2.0.1
 channels==2.3.1
