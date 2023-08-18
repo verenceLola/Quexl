@@ -40,7 +40,7 @@ class JWTAuthentication(TokenAuthentication):
 
     @staticmethod
     def decode_jwt(token):
-        """ Method for decoding token."""
+        """Method for decoding token."""
         # It takes the token, secret_key and algorithm
         user_details = jwt.decode(
             token, settings.SECRET_KEY, algorithm="HS256"
@@ -67,7 +67,7 @@ class JWTAuthentication(TokenAuthentication):
 
     @staticmethod
     def generate_reset_token(email):
-        """ generates reset password token """
+        """generates reset password token"""
 
         token = jwt.encode(
             {
@@ -87,7 +87,6 @@ class JWTAuthentication(TokenAuthentication):
 class TokenGenerator(PasswordResetTokenGenerator):
     @staticmethod
     def _generate_hash_value(user, timestamp):
-
         return (
             six.text_type(user.email)
             + six.text_type(timestamp)

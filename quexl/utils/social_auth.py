@@ -41,7 +41,6 @@ class SocialAuth:
                 )
 
         elif isinstance(self.backend, BaseOAuth2):
-
             access_token = serializer_data.get("access_token")
 
         return access_token

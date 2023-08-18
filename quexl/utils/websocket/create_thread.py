@@ -23,7 +23,9 @@ class CreateThread:
         to: User,
         type: str,
         participants: list = [],
-    ) -> Thread:  # TODO: modify function to make it idempotent for asynchronicy
+    ) -> (
+        Thread
+    ):  # TODO: modify function to make it idempotent for asynchronicy
         """
         get or create chat thread/ group
         """

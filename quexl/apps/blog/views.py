@@ -26,7 +26,7 @@ class BlogList(ListCreateAPIView):
     renderer_classes = (DefaultRenderer,)
 
     def create(self, request, **kwargs):
-        """overide creating of blog """
+        """overide creating of blog"""
         self.operation = "Create blog "
         return super(ListCreateAPIView, self).create(request, **kwargs)
 
@@ -63,7 +63,7 @@ class CommentList(ListCreateAPIView):
     renderer_classes = (DefaultRenderer,)
 
     def create(self, request, **kwargs):
-        """overide creating of comment """
+        """overide creating of comment"""
         self.operation = "Create comment "
         return super(ListCreateAPIView, self).create(request, **kwargs)
 
@@ -100,7 +100,7 @@ class LikeList(ListCreateAPIView):
     renderer_classes = (DefaultRenderer,)
 
     def create(self, request, **kwargs):
-        """overide creating of like """
+        """overide creating of like"""
         self.operation = "Like blog "
         return super(ListCreateAPIView, self).create(request, **kwargs)
 
@@ -118,6 +118,6 @@ class DislikeList(ListCreateAPIView):
     renderer_classes = (DefaultRenderer,)
 
     def create(self, request, **kwargs):
-        """overide creating of dislike """
+        """overide creating of dislike"""
         self.operation = "Dislike blog "
         return super(ListCreateAPIView, self).create(request, **kwargs)

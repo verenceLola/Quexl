@@ -9,7 +9,6 @@ import quexl.helpers.fancy_generator
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
         ("blog", "0005_auto_20200331_0841"),

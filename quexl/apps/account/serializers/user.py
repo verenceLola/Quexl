@@ -25,7 +25,7 @@ class UserSerializer(serializers.ModelSerializer):
         """Performs an update on a User."""
         password = validated_data.pop("password", None)
 
-        for (key, value) in validated_data.items():
+        for key, value in validated_data.items():
             setattr(instance, key, value)
 
         if password is not None:

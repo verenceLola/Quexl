@@ -5,7 +5,7 @@ class Errors:
         remove empty objects in the present in response data
         """
 
-        for (field, errors) in data.items():
+        for field, errors in data.items():
             if isinstance(errors, list):
                 errors = list(filter(lambda value: value != {}, errors))
                 data[field] = errors

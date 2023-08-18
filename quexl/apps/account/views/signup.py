@@ -18,7 +18,7 @@ class SignUpAPIView(GenericAPIView):
     operation = "Signup"
 
     def post(self, request: Request, **kwargs) -> Response:
-        """ Signup a new user """
+        """Signup a new user"""
         email, username, password = (
             request.data.get("email", None),
             request.data.get("username", None),
@@ -41,7 +41,6 @@ class SignUpAPIView(GenericAPIView):
         )
 
     def get(self, request: Request) -> Response:
-
         return Response(
             {"message": "Only POST requests are allowed to this endpoint."},
             status=status.HTTP_405_METHOD_NOT_ALLOWED,

@@ -133,7 +133,7 @@ class CategorySerializer(serializers.ModelSerializer):
         """
         update category details
         """
-        for (key, value) in validated_data.items():
+        for key, value in validated_data.items():
             setattr(instance, key, value)
         try:
             instance.save()

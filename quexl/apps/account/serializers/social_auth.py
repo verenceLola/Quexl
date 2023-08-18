@@ -2,7 +2,7 @@ from rest_framework import serializers
 
 
 class SocialAuthSerializer(serializers.Serializer):
-    """ Accepts provider, access token , and access_token_secret"""
+    """Accepts provider, access token , and access_token_secret"""
 
     provider = serializers.CharField(max_length=255, required=True)
     access_token = serializers.CharField(

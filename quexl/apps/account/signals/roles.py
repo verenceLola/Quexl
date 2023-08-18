@@ -12,7 +12,6 @@ from quexl.apps.account.models import User
 
 @receiver(post_save, sender=User)
 def add_regular_user_role(sender: Type[User], **kwargs) -> None:
-
     if kwargs["created"]:  # assign user role to new users only
         user = kwargs["instance"]
         assign_role(user, "regular_user")

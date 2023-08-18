@@ -13,7 +13,7 @@ class DeactivateUserAPIView(GenericAPIView):
     operation = "Account deactivation"
 
     def get(self, request, *args, **kwargs):
-        """ Method for deactivating user acount"""
+        """Method for deactivating user acount"""
         user = User.objects.get(id=kwargs.get("id"))
         if request.user == user or request.user.is_superuser:
             user.is_active = False

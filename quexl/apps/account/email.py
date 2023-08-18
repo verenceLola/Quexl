@@ -35,7 +35,6 @@ class Email:
                 html_message=body,
             )
         except:  # TODO: Catch Specific exception  # noqa
-
             return Response(
                 data={"message": "Email activation failed"},
                 status=status.HTTP_400_BAD_REQUEST,

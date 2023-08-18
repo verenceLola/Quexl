@@ -31,7 +31,6 @@ class SocialAuthView(GenericAPIView):
             )
 
         except MissingBackend:
-
             return Response(
                 {"error": "The Provider is invalid"},
                 status=status.HTTP_400_BAD_REQUEST,
@@ -44,7 +43,6 @@ class SocialAuthView(GenericAPIView):
             user = social_auth.save_user(access_token)
 
         except BaseException:
-
             return Response(
                 {"error": "Invalid token"}, status=status.HTTP_400_BAD_REQUEST
             )

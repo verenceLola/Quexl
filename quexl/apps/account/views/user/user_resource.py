@@ -35,7 +35,6 @@ class UserResourceAPIView(GenericAPIView):
             )
 
         except (KeyError, User.DoesNotExist, AttributeError):
-
             return Response(
                 {
                     "message": "Failed to fetch user details",
