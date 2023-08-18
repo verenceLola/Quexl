@@ -118,7 +118,7 @@ pytz==2018.9
 PyYAML==5.4
 redis==2.10.6
 regex==2019.12.20
-requests==2.22.0
+requests==2.31.0
 requests-oauthlib==1.2.0
 service-identity==18.1.0
 simplejson==3.16.0
