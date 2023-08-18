@@ -76,7 +76,6 @@ class ForgotPasswordView(GenericAPIView):
             )
 
         except (KeyError, User.DoesNotExist):
-
             return Response(
                 {
                     "message": "Password Reset Request failed",

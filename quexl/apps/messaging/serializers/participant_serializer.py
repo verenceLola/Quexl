@@ -3,7 +3,6 @@ from rest_framework import serializers
 
 
 class ParticipantSerializer(serializers.Serializer):
-
     username = serializers.CharField()
     email = serializers.CharField(read_only=True)
 

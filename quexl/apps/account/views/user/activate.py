@@ -13,7 +13,7 @@ class ActivateUserAPIView(GenericAPIView):
     operation = "Account activation"
 
     def get(self, request, *args, **kwargs):
-        """ Method for activating user acount"""
+        """Method for activating user acount"""
         user = User.objects.get(id=kwargs.get("id"))
         if user.is_active:
             return Response(

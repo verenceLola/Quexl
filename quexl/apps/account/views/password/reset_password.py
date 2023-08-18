@@ -17,7 +17,6 @@ class ResetPasswordView(GenericAPIView):
     operation = "Password reset"
 
     def put(self, request: Request, token: str, *args, **kwargs) -> Response:
-
         try:
             new_password = request.data.get("password")
             serializer = self.serializer_class(data={"password": new_password})
@@ -35,7 +34,6 @@ class ResetPasswordView(GenericAPIView):
                 status=status.HTTP_200_OK,
             )
         except jwt.PyJWTError:
-
             return Response(
                 {
                     "error": "Invalid token. Please request a new password reset "

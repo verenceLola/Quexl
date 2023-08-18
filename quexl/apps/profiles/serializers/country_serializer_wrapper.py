@@ -13,7 +13,6 @@ class CountrySerializerWrapper(serializers.ModelSerializer):
         validate country code
         """
         if countries.countries.get(value.upper()):
-
             return value.upper()
 
         raise ValidationError("%s is not a valid country code" % value)

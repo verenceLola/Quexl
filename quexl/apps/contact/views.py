@@ -23,7 +23,7 @@ class ContactList(ListCreateAPIView):
     renderer_classes = (DefaultRenderer,)
 
     def create(self, request, **kwargs):
-        """overide creating of contact """
+        """overide creating of contact"""
         self.operation = "Create contact "
         return super(ListCreateAPIView, self).create(request, **kwargs)
 

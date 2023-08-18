@@ -12,7 +12,6 @@ import quexl.helpers.fancy_generator
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("services", "0002_auto_20200221_1208"),
     ]

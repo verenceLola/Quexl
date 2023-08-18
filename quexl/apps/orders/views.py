@@ -46,7 +46,7 @@ class ParameterList(ListCreateAPIView):
     renderer_classes = (DefaultRenderer,)
 
     def create(self, request, **kwargs):  # pragma: no cover
-        """overide creating of parameter """
+        """overide creating of parameter"""
         self.operation = "Create parameter "
         return super(ListCreateAPIView, self).create(request, **kwargs)
 

@@ -8,7 +8,6 @@ import quexl.helpers.fancy_generator
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("orders", "0007_auto_20200725_1203"),
     ]

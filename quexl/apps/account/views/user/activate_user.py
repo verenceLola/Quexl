@@ -16,13 +16,12 @@ class UserActivationAPIView(GenericAPIView):
     operation = "Account activation"
 
     def get(self, request: Request, token: str, *args, **kwargs) -> Response:
-        """ Method for getting user token and activating them. """
+        """Method for getting user token and activating them."""
 
         try:
             data = JWTAuthentication.decode_jwt(token)
             user = User.objects.get(username=data["userdata"])
         except (User.DoesNotExist, jwt.exceptions.DecodeError):
-
             return Response(
                 {"message": "Activation link is invalid."},
                 status=status.HTTP_400_BAD_REQUEST,
